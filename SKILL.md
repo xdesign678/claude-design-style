@@ -1,0 +1,429 @@
+---
+name: claude-design-style
+description: >
+  Apply the Anthropic/Claude website design aesthetic to any web project.
+  Use when the user explicitly references "Claude style", "Anthropic design",
+  "elegant reading design", "warm minimal design", "literary web design",
+  or asks for a calm, editorial, premium feel inspired by claude.ai or anthropic.com.
+  Also triggers for Chinese: "做成 Claude 风格"、"温暖简约设计"、"文学感网页"、
+  "Anthropic 设计风格"、"阅读体验"、"克制优雅设计".
+  NOT for: data dashboards, e-commerce, game/entertainment, or generic
+  "make it look better" requests without explicit aesthetic direction.
+---
+
+# Claude Design Style
+
+Apply the Anthropic/Claude design system to any web project. Based on deep extraction and analysis of anthropic.com, claude.ai, and the Claude App interface.
+
+This system emphasizes warm minimalism, typographic clarity, generous whitespace, and a literary reading experience.
+
+## Execution Flow
+
+1. **Understand the task** — Is this "create from scratch" or "restyle existing code"? Full redesign or targeted component?
+2. **Identify the stack** — Tailwind/React → use Tailwind classes + CSS variables. Plain HTML/CSS → use CSS variables + native CSS. Unknown → default to CSS variables (most portable).
+3. **Load reference files on demand** (do NOT load all 7 at once):
+   - Color tokens → `references/colors.md`
+   - Font loading + type scale → `references/typography.md`
+   - Complex components (modal, code block, tabs) → `references/components.md`
+   - Page structure, grid, breakpoints → `references/layout.md`
+   - Animations, loading states → `references/motion.md`
+   - Claude Logo SVG / brand rules → `references/brand.md`
+   - AI chat interface (sidebar, messages, input) → `references/claude-app.md`
+   - Form validation, field groups → `references/forms.md`
+   - Empty states, Skeleton, Toast, error pages → `references/states.md`
+   - shadcn/ui theme config → `references/shadcn.md`
+4. **Apply styles** — Start with `:root` CSS variables, then components, then spacing.
+5. **Validate** with Quick Checklist (18 items) before finishing.
+
+**Restyle mode** (existing code): Introduce `:root` variables first → scan for Anti-Pattern violations → replace colors → replace fonts → adjust spacing. Preserve all HTML structure and logic.
+
+**Minimal-intervention mode** (single component): Output only the relevant component CSS/JSX. Do not dump the full variable system unless asked.
+
+---
+
+## Design Philosophy
+
+Anthropic's design conveys **intellectual warmth** — scholarly yet approachable, minimal yet not cold. The aesthetic is closer to a premium book publisher than a typical SaaS product.
+
+Core principles:
+- **Content is king** — the design disappears so text shines
+- **Warm, not sterile** — cream tones instead of pure white, near-black instead of #000
+- **Typographic hierarchy** — serif for reading content, sans-serif for UI/navigation
+- **Generous breathing room** — wide margins, tall line-heights, constrained content width
+- **Restrained interaction** — subtle transitions (150-300ms), no flashy animations
+- **Quiet confidence** — no gradients, no textures, no visual noise
+- **Systematic design** — 8px grid, consistent 7.5/8px radii, unified shadow scale
+
+### Dual Brand Context
+
+Anthropic operates two distinct design contexts:
+- **anthropic.com**: Corporate/research site — uses serif (TiemposText) for display headlines and sans for body/navigation
+- **claude.ai/claude.com**: Product interface — uses sans for headings and serif for reading content
+- **This skill focuses on the claude.ai reading-focused pattern** (serif body, sans headings) as it's most commonly needed for building apps
+
+## Design Tokens (Quick Reference)
+
+### Colors — Light Mode
+
+```css
+:root {
+  /* Brand */
+  --brand-clay: #d97757;              /* Claude signature warm orange — logo only */
+
+  /* Backgrounds */
+  --bg-primary: #faf9f5;              /* warm cream page background */
+  --bg-secondary: #f9f9f7;            /* slightly cooler cream */
+  --bg-hover: #f5f4f0;               /* hover state */
+  --bg-card: #ffffff;                 /* card surface */
+  --bg-button: #0f0f0e;              /* primary button — near-black */
+  --bg-button-hover: #2a2a27;        /* primary button hover */
+  --bg-active: #efeee8;              /* pressed/active state */
+  --bg-muted: #f0efe8;               /* muted sections, code bg */
+
+  /* Text */
+  --text-primary: #141413;            /* headings and body */
+  --text-body: rgba(20,20,19,0.85);   /* body text at 85% — softer reading */
+  --text-secondary: #5e5d59;          /* supporting text */
+  --text-tertiary: #b0aea5;           /* captions, timestamps — decorative only, 2.4:1 contrast */
+  --text-on-button: #faf9f5;          /* text on dark buttons */
+
+  /* Borders */
+  --border-light: rgba(0,0,0,0.08);   /* card borders */
+  --border-default: rgba(0,0,0,0.12); /* input borders */
+  --border-section: rgba(0,0,0,0.06); /* section dividers */
+
+  /* Shadows (very subtle) */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.16);
+}
+```
+
+### Colors — Dark Mode
+
+```css
+.dark {
+  --bg-primary: #1a1a18;              /* warm charcoal */
+  --bg-secondary: #232320;
+  --bg-hover: #2a2a27;
+  --bg-card: #232320;
+  --bg-button: #ece9e1;              /* inverted — light button */
+  --bg-muted: #2a2a27;
+
+  --text-primary: #ece9e1;            /* warm off-white */
+  --text-secondary: #9b9b95;
+  --text-tertiary: #6b6b66;
+  --text-on-button: #1a1a18;
+
+  --border-light: rgba(236,233,225,0.08);
+  --border-default: rgba(236,233,225,0.12);
+  --border-section: rgba(236,233,225,0.06);
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.24);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.32);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.40);
+}
+```
+
+See [references/colors.md](references/colors.md) for full token list and Tailwind config.
+
+### Typography
+
+| Element | Font | Size | Weight | Line-height | Letter-spacing |
+|---------|------|------|--------|-------------|----------------|
+| Body text | Serif | 17px (1.0625rem) | 400 | 1.6 | normal |
+| H1 (hero) | Sans | clamp(2.5rem,...,4rem) | 700 | 1.1 | -0.02em |
+| H2 (section) | Sans | clamp(1.75rem,...,2.5rem) | 600 | 1.2 | -0.01em |
+| H3 (subsection) | Sans | clamp(1.25rem,...,1.75rem) | 600 | 1.3 | normal |
+| Nav/UI | Sans | 15px | 400 | 1.5 | normal |
+| Button | Sans | 15px | 400 | 1.5 | normal |
+| Small/label | Sans | 12px | 500 | 1.4 | 0.05em (uppercase) |
+| Code | Mono | 0.9em | 400 | 1.5 | normal |
+
+**Font stacks**:
+- **Reading**: `Lora, "Noto Serif SC", Georgia, "Times New Roman", serif`
+- **UI/Headings**: `Geist, Inter, system-ui, -apple-system, sans-serif`
+- **Code**: `"Geist Mono", "JetBrains Mono", "SF Mono", monospace`
+
+### Fluid Typography
+
+Use `clamp()` for responsive type scaling without breakpoints. Key values from anthropic.com:
+
+```css
+/* Fluid Display Scale (from anthropic.com) */
+--font-size-display-xs: clamp(1.125rem, 1.087rem + 0.163vw, 1.25rem);   /* 18→20px */
+--font-size-display-s: clamp(1.25rem, 1.173rem + 0.327vw, 1.5rem);      /* 20→24px */
+--font-size-display-m: clamp(1.75rem, 1.673rem + 0.327vw, 2rem);        /* 28→32px */
+--font-size-display-l: clamp(2rem, 1.694rem + 1.306vw, 3rem);           /* 32→48px */
+--font-size-display-xl: clamp(2.5rem, 2.041rem + 1.959vw, 4rem);        /* 40→64px */
+--font-size-display-xxl: clamp(3rem, 2.388rem + 2.612vw, 5rem);         /* 48→80px */
+
+/* Fluid Paragraph Scale */
+--font-size-paragraph-s: clamp(1rem, 0.962rem + 0.163vw, 1.125rem);     /* 16→18px */
+--font-size-paragraph-m: clamp(1.125rem, 1.087rem + 0.163vw, 1.25rem);  /* 18→20px */
+```
+
+See [references/typography.md](references/typography.md) for font loading, CSS, and Tailwind config.
+
+### Spacing (8px grid)
+
+```
+4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 80px
+```
+
+Key spacings:
+- Section gap: 64-80px (py-16 to py-20)
+- H2 top margin: 64px, bottom: 32px
+- H3 top margin: 40px, bottom: 16px
+- Paragraph gap: 16-20px
+- Content column: **640px** max-width (reading), **768-840px** (app chat)
+- Site margin: `clamp(2rem, 1.08rem + 3.92vw, 5rem)`
+- Nav height: **68px** (4.25rem)
+
+### Border Radius
+
+```
+4px    — small: tags, badges, inline code
+7.5px  — medium: buttons, inputs ← Anthropic signature radius
+8px    — large: cards, containers
+12px   — extra-large: modals, images, panels
+```
+
+**IMPORTANT**: Buttons use `border-radius: 7.5px`, NOT pill shape (rounded-full).
+
+### Transitions
+
+```css
+--transition-fast: 150ms ease;
+--transition-base: 200ms ease;
+--transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+--transition-menu: 400ms ease;
+```
+
+See [references/motion.md](references/motion.md) for keyframes and animation patterns.
+
+## Components
+
+### Buttons
+
+```css
+/* Primary — dark bg, cream text, 7.5px radius */
+.btn-primary {
+  background: var(--bg-button);       /* #0f0f0e */
+  color: var(--text-on-button);       /* #faf9f5 */
+  border: none;
+  border-radius: 7.5px;
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 400;
+  font-family: var(--font-sans);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.btn-primary:active { transform: translateY(0); }
+
+/* Secondary — outlined */
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 7.5px;
+  padding: 8px 16px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+.btn-secondary:hover { background: var(--bg-hover); }
+
+/* Ghost — text only */
+.btn-ghost {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  font-size: 15px;
+  transition: color 0.15s ease;
+}
+.btn-ghost:hover { color: var(--text-primary); }
+```
+
+### Cards
+
+```css
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);  /* rgba(0,0,0,0.08) */
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: none;                       /* flat by default */
+  transition: box-shadow 0.2s ease;
+}
+.card:hover {
+  box-shadow: var(--shadow-md);           /* subtle lift on hover */
+}
+```
+
+**Card Hover Dimming** (sibling awareness):
+
+```css
+/* Sibling dimming — hovered card stays, others fade */
+.card-grid:has(.card:hover) .card:not(:hover) {
+  opacity: 0.6;
+  transition: opacity 300ms ease;
+}
+```
+
+### Selection Highlighting
+
+```css
+::selection {
+  background: rgba(204, 120, 92, 0.5);
+  color: inherit;
+}
+```
+
+### Links
+
+```css
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-color: rgba(20,20,19,0.3);
+  transition: text-decoration-color 0.15s ease;
+}
+a:hover {
+  text-decoration-color: rgba(20,20,19,0.6);
+}
+```
+
+### Inputs
+
+```css
+input, textarea {
+  border: 1px solid var(--border-default);
+  border-radius: 7.5px;
+  padding: 8px 16px;
+  font-size: 15px;
+  font-family: var(--font-sans);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease;
+}
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--text-secondary);
+  box-shadow: 0 0 0 2px rgba(94,93,89,0.15);
+}
+```
+
+### Navigation
+
+```css
+nav {
+  height: 68px;
+  padding: 0 clamp(2rem, 1.08rem + 3.92vw, 5rem);
+  border-bottom: 1px solid var(--border-section);
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+}
+nav a {
+  font-size: 15px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+nav a:hover { color: var(--text-primary); }
+```
+
+### Icons
+
+- Size: **16x16px** standard, 20x20px large
+- Style: `fill="currentColor"` (filled paths, NOT stroked outlines)
+- Color: inherits from text via currentColor
+- Library: Lucide Icons or similar minimal set
+- Gap from text: 4-8px
+
+See [references/components.md](references/components.md) for code blocks, dropdowns, modals, badges, and more.
+
+## Prose / Rich Content (Tailwind Typography)
+
+```
+prose dark:prose-invert max-w-none
+prose-headings:font-sans prose-headings:font-semibold prose-headings:tracking-tight
+prose-h2:mt-16 prose-h2:mb-8
+prose-h3:mt-10 prose-h3:mb-4
+prose-p:mb-4 prose-p:leading-relaxed
+prose-a:text-inherit prose-a:underline prose-a:underline-offset-2
+prose-a:decoration-foreground/30 hover:prose-a:decoration-foreground/60
+prose-blockquote:border-foreground/15 prose-blockquote:not-italic
+prose-blockquote:text-[var(--text-secondary)] prose-blockquote:pl-6
+prose-code:bg-[var(--bg-muted)] prose-code:px-1.5 prose-code:py-0.5
+prose-code:rounded prose-code:text-[0.9em]
+prose-code:before:content-none prose-code:after:content-none
+prose-pre:bg-[var(--bg-muted)] prose-pre:border prose-pre:border-[var(--border-light)]
+prose-pre:rounded-lg
+prose-li:mb-1
+prose-hr:border-[var(--border-section)]
+```
+
+## Anti-Patterns (Never Do)
+
+- Gradients on backgrounds, buttons, or any element
+- Pill-shaped buttons (rounded-full) — use `border-radius: 7.5px`
+- Drop shadows heavier than `--shadow-md`
+- `brand-clay` (#d97757) on any UI element except the Claude Logo — not buttons, links, badges, or focus rings
+- Pure white (#fff) or pure black (#000) anywhere
+- Cool-toned grays — always use warm grays (the `--bg-*` and `--text-*` tokens have warm undertones)
+- Thick borders (>1px) or colored borders
+- Stroked/outline icons — use filled with currentColor
+- Heavy animations, bounces, spring physics
+- Dense layouts — minimum 32px between content blocks, minimum 16px between paragraphs
+- Colored links (blue, green, purple, etc.) — links use `color: inherit` and are distinguished only by underline opacity
+- Emojis in UI text (casual/playful aesthetic conflicts with literary tone)
+- Cool-toned `::selection` highlight — use `rgba(204,120,92,0.5)` (warm clay)
+- Using `--text-tertiary` for essential information — its 2.4:1 contrast is decorative-only
+
+## Quick Checklist
+
+When applying this style, verify:
+
+1. [ ] Background is warm cream (#faf9f5), not white
+2. [ ] Text is warm near-black (#141413), not #000
+3. [ ] Body text uses **serif** font (Lora or equivalent)
+4. [ ] Headings/UI use **sans-serif** font (Geist/Inter)
+5. [ ] Content max-width: 640px (reading) or 768-840px (app)
+6. [ ] Line-height 1.6 for body, 1.1-1.3 for headings
+7. [ ] Buttons: `border-radius: 7.5px`, dark bg (#0f0f0e), cream text
+8. [ ] Links: same-color text, subtle underline (offset 0.2em)
+9. [ ] Borders: rgba(0,0,0,0.08-0.12), barely visible
+10. [ ] Shadows: 8-16% opacity max
+11. [ ] Icons: 16px, filled (currentColor)
+12. [ ] No gradients, no textures
+13. [ ] Generous whitespace on 8px grid
+14. [ ] Transitions: 150-300ms ease
+15. [ ] Nav height: 68px with 1px bottom border
+16. [ ] Selection highlight uses warm clay tone (rgba(204,120,92,0.5))
+17. [ ] Card grids use sibling-dimming on hover
+18. [ ] Typography uses fluid clamp() for responsive scaling
+
+## Reference Files
+
+Load these **on demand** based on your task. Do not load all at once.
+
+| File | Contents | When to Load |
+|------|----------|--------------|
+| [references/typography.md](references/typography.md) | Font loading, stacks, computed styles, Tailwind config | When setting up fonts or adjusting type scale |
+| [references/colors.md](references/colors.md) | Full color tokens, semantic system, Tailwind/CSS config | When you need complete token list or Tailwind config |
+| [references/components.md](references/components.md) | Code blocks, modals, dropdowns, badges, tables, accordion | When building complex components not in SKILL.md |
+| [references/layout.md](references/layout.md) | Grid system, responsive breakpoints, page templates | When designing page structure or responsive behavior |
+| [references/motion.md](references/motion.md) | Keyframes, transitions, loading states, scroll behavior | When adding animations or transitions |
+| [references/brand.md](references/brand.md) | Logo SVGs, icon guidelines, brand usage rules | **Only** when you need the Claude Logo SVG or brand rules |
+| [references/claude-app.md](references/claude-app.md) | Chat UI: message bubbles, input, sidebar, artifacts | When building an AI chat interface |
+| [references/forms.md](references/forms.md) | Form validation states, field groups, special inputs | When building forms with validation |
+| [references/states.md](references/states.md) | Empty states, Skeleton, Toast, error pages | When building loading/empty/error UI patterns |
+| [references/shadcn.md](references/shadcn.md) | shadcn/ui theme config, HSL variables, globals.css | When integrating with shadcn/ui |
