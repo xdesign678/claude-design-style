@@ -79,7 +79,7 @@ Complete color token system for the Anthropic/Claude design style.
   --bg-primary: #1a1a18;
   --bg-secondary: #232320;
   --bg-hover: #2a2a27;
-  --bg-active: #333330;
+  --bg-active: rgba(236,233,225,0.08);
   --bg-card: #232320;
   --bg-muted: #2a2a27;
   --bg-button: #ece9e1;         /* inverted in dark mode */

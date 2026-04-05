@@ -6,7 +6,9 @@
 <title>UI 状态展示 — NeuralMind</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
 <style>
 :root {
   --brand-clay: #d97757;
@@ -203,8 +205,8 @@ body {
   color: var(--text-primary);
 }
 .toast-error {
-  background: rgba(224,82,82,0.08);
-  border-color: rgba(224,82,82,0.2);
+  background: rgba(184,91,68,0.08);
+  border-color: rgba(184,91,68,0.2);
   color: var(--text-primary);
 }
 .toast-warn {
@@ -219,7 +221,7 @@ body {
   flex-shrink: 0;
 }
 .toast-success .toast-dot { background: #4a9d6f; }
-.toast-error .toast-dot { background: #e05252; }
+.toast-error .toast-dot { background: #b85b44; }
 .toast-warn .toast-dot { background: var(--brand-clay); }
 .toast-text { flex: 1; }
 .toast-close {
@@ -373,6 +375,9 @@ button { font-size: 15px; font-family: Geist, Inter, system-ui, -apple-system, s
 <button class="theme-btn" id="themeToggle">切换暗色</button>
 
 <script>
+if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.documentElement.classList.add('dark');
+}
 document.getElementById('themeToggle').addEventListener('click', function() {
   document.documentElement.classList.toggle('dark');
   this.textContent = document.documentElement.classList.contains('dark') ? '切换浅色' : '切换暗色';

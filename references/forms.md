@@ -12,7 +12,7 @@ Form validation states, field groups, and special inputs for the Anthropic/Claud
   --state-error: #b85b44;          /* warm brick red — harmonious with brand clay */
   --state-error-bg: rgba(184,91,68,0.06);
   --state-error-border: rgba(184,91,68,0.35);
-  --state-warning: #9a7020;        /* warm amber — muted, on-brand */
+  --state-warning: #c4923a;        /* warm amber — muted, on-brand */
   --state-warning-bg: rgba(154,112,32,0.06);
   --state-success: #5a856a;        /* muted sage green — low saturation */
   --state-success-bg: rgba(90,133,106,0.06);

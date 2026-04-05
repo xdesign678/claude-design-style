@@ -57,13 +57,20 @@ Core principles:
 ### Dual Brand Context
 
 Anthropic operates two distinct design contexts:
-- **anthropic.com**: Corporate/research site — uses serif (TiemposText) for display headlines and sans for body/navigation
-- **claude.ai/claude.com**: Product interface — uses sans for headings and serif for reading content
-- **This skill focuses on the claude.ai reading-focused pattern** (serif body, sans headings) as it's most commonly needed for building apps
+- **anthropic.com**: Corporate/marketing site — uses serif (TiemposText) for display headlines, **sans for body text**
+- **claude.ai/claude.com**: Product/reading interface — uses sans for headings, **serif for body text**
+
+**Choose the right pattern for your page type:**
+- **Marketing / Landing pages** (hero, features, pricing): use **sans body text** + optional serif for large display headlines only
+- **Reading / Article / App pages** (blog posts, research articles, documentation): use **serif body text** + sans headings
+
+This skill defaults to the **claude.ai reading-focused pattern** (serif body, sans headings) because it is most commonly needed for building content-heavy apps. When building a pure marketing landing page, switch body text to sans and reserve serif only for hero display headlines if desired.
 
 ## Design Tokens (Quick Reference)
 
-### Colors — Light Mode
+### CSS Custom Properties — Light Mode (Colors + Typography)
+
+All design tokens in a single `:root` block. Font tokens (`--font-*`) do not change between light/dark mode.
 
 ```css
 :root {
@@ -87,8 +94,10 @@ Anthropic operates two distinct design contexts:
   --text-tertiary: #b0aea5;           /* captions, timestamps — decorative only, 2.4:1 contrast */
   --text-on-button: #faf9f5;          /* text on dark buttons */
 
-  /* Typography */
+  /* Typography — same in light and dark mode */
+  --font-sans: Geist, Inter, system-ui, -apple-system, sans-serif;
   --font-reading: Lora, "Noto Serif SC", Georgia, "Times New Roman", serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", "SF Mono", monospace;
 
   /* Borders */
   --border-light: rgba(20,20,19,0.08);   /* card borders — warm-tinted */
@@ -102,7 +111,7 @@ Anthropic operates two distinct design contexts:
 }
 ```
 
-### Colors — Dark Mode
+### CSS Custom Properties — Dark Mode Overrides
 
 ```css
 .dark {
@@ -128,6 +137,29 @@ Anthropic operates two distinct design contexts:
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.24);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.32);
   --shadow-lg: 0 8px 24px rgba(0,0,0,0.40);
+}
+```
+
+### Dark Mode Edge Cases
+
+**Featured pricing card** — In light mode, featured cards invert to dark background (`--bg-button: #0f0f0e`). In dark mode `--bg-button` flips to `#ece9e1` (cream), which creates a jarring light card on a dark page. Add an explicit dark-mode override:
+
+```css
+.dark .pricing-card.featured {
+  background: #2e2e2b;          /* mid-dark — stands out without glaring */
+  border-color: rgba(236,233,225,0.15);
+}
+.dark .pricing-card.featured .btn-primary {
+  background: var(--text-primary);   /* #ece9e1 warm white */
+  color: var(--bg-primary);          /* #1a1a18 dark bg */
+}
+```
+
+**Navigation border in dark mode** — `--border-section` is `rgba(236,233,225,0.06)` which is intentionally ultra-subtle (nearly invisible). This is the correct Anthropic pattern — the nav blends into the page. If you need a more visible separator (e.g. when nav background contrasts less with content), increase opacity to `0.10`:
+
+```css
+.dark nav {
+  border-bottom-color: rgba(236,233,225,0.10); /* slightly more visible if needed */
 }
 ```
 
@@ -204,6 +236,19 @@ Key spacings:
 --transition-base: 200ms ease;
 --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 --transition-menu: 400ms ease;
+```
+
+**Always include reduced-motion support** (Checklist item 28):
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 ```
 
 See [references/motion.md](references/motion.md) for keyframes and animation patterns.
@@ -304,6 +349,14 @@ a {
 a:hover {
   text-decoration-color: rgba(20,20,19,0.6);
 }
+
+/* Dark mode override — required, otherwise underline is invisible on dark bg */
+.dark a {
+  text-decoration-color: rgba(236,233,225,0.3);
+}
+.dark a:hover {
+  text-decoration-color: rgba(236,233,225,0.6);
+}
 ```
 
 ### Inputs
@@ -313,7 +366,7 @@ input, textarea {
   border: 1px solid var(--border-default);
   border-radius: 7.5px;
   padding: 8px 16px;
-  font-size: 15px;
+  font-size: 16px; /* 16px required — prevents iOS auto-zoom on focus */
   font-family: var(--font-sans);
   background: var(--bg-card);
   color: var(--text-primary);
@@ -445,3 +498,15 @@ Load these **on demand** based on your task. Do not load all at once.
 | [references/forms.md](references/forms.md) | Form validation states, field groups, special inputs | When building forms with validation |
 | [references/states.md](references/states.md) | Empty states, Skeleton, Toast, error pages | When building loading/empty/error UI patterns |
 | [references/shadcn.md](references/shadcn.md) | shadcn/ui theme config, HSL variables, globals.css | When integrating with shadcn/ui |
+
+### Examples
+
+完整的标准答案页面位于 `examples/` 目录：
+
+- `blog-article.html` — 文章/阅读页（原生 CSS）
+- `landing-page.html` — 产品首页（原生 CSS）
+- `auth-page.html` — 登录/注册页（原生 CSS）
+- `tailwind-landing.html` — 产品首页，**Tailwind CDN 版本**；含 `tailwind.config` token 映射、`darkMode: 'class'`、响应式导航、card grid sibling dimming、定价卡片 dark mode 边缘处理
+- `shadcn-globals.css` — **shadcn/ui 项目 drop-in globals.css**；所有 token 用 HSL 格式，含亮色 + 暗色，配套 `tailwind.config.ts` 见 `references/shadcn.md`
+
+生成页面时可参考这些标准实现。**React + Tailwind 栈**优先参考 `tailwind-landing.html` 和 `shadcn-globals.css`。

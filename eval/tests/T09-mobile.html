@@ -6,7 +6,9 @@
 <title>NeuralMind Mobile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet">
 <style>
 :root {
   --brand-clay: #d97757;
@@ -31,6 +33,21 @@
   --font-sans: Geist, Inter, system-ui, -apple-system, sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", "SF Mono", monospace;
 }
+.dark {
+  --bg-primary: #1a1a18;
+  --bg-secondary: #232320;
+  --bg-hover: #2a2a27;
+  --bg-card: #232320;
+  --bg-button: #ece9e1;
+  --bg-button-hover: #d4d1c9;
+  --text-primary: #ece9e1;
+  --text-secondary: #9b9b95;
+  --text-tertiary: #6b6b66;
+  --text-on-button: #1a1a18;
+  --border-light: rgba(236,233,225,0.08);
+  --border-default: rgba(236,233,225,0.12);
+  --border-section: rgba(236,233,225,0.06);
+}
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
@@ -40,6 +57,7 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 ::selection { background: rgba(204,120,92,0.5); color: inherit; }
 :focus-visible { outline: 2px solid var(--brand-clay); outline-offset: 2px; }
@@ -192,7 +210,7 @@ input:focus {
   transition: background 0.2s ease;
 }
 .btn-submit:hover { background: var(--bg-button-hover); }
-.error-msg { font-size: 13px; color: #e05252; }
+.error-msg { font-size: 13px; color: #b85b44; }
 
 /* Fixed bottom action */
 .bottom-action {
@@ -303,6 +321,9 @@ button { font-size: 15px; font-family: Geist, Inter, system-ui, -apple-system, s
 </div>
 
 <script>
+if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.documentElement.classList.add('dark');
+}
 document.getElementById('menuBtn').addEventListener('click', () => {
   document.getElementById('mobileMenu').classList.add('open');
 });
@@ -315,7 +336,7 @@ document.getElementById('signupForm').addEventListener('submit', e => {
   const err = document.getElementById('emailError');
   if (!email.value.includes('@')) {
     err.style.display = 'block';
-    email.style.borderColor = '#e05252';
+    email.style.borderColor = '#b85b44';
   } else {
     err.style.display = 'none';
     email.style.borderColor = '';
