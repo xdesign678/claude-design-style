@@ -14,7 +14,7 @@
 | `--bg-primary` dark (`#1a1a18`) | ✅ 一致 | 所有文件一致 |
 | `--bg-secondary` light (`#f0eee6`) | ✅ 一致 | SKILL.md、colors.md 一致 |
 | `--bg-secondary` dark (`#232320`) | ✅ 一致 | |
-| `--bg-card` light (`#ffffff`) | ✅ 一致 | |
+| `--bg-card` light (`#fefdfb`) | ✅ 一致 | |
 | `--bg-card` dark (`#232320`) | ✅ 一致 | |
 | `--bg-button` light (`#0f0f0e`) | ✅ 一致 | |
 | `--bg-button` dark (`#ece9e1`) | ✅ 一致 | |

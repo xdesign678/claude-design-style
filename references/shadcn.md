@@ -24,7 +24,7 @@ Replace the default shadcn globals.css `:root` and `.dark` blocks with this:
     --foreground: 40 7% 8%;             /* #141413 — near-black */
 
     /* ── Card / Panel ── */
-    --card: 0 0% 100%;                  /* #ffffff */
+    --card: 0 0% 100%;                  /* #fefdfb (warm near-white) */
     --card-foreground: 40 7% 8%;
 
     /* ── Popover ── */
@@ -300,7 +300,7 @@ const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
 | Token | HEX | HSL |
 |-------|-----|-----|
 | `--bg-primary` | `#faf9f5` | `48 33% 97%` |
-| `--bg-card` | `#ffffff` | `0 0% 100%` |
+| `--bg-card` | `#fefdfb` | `0 0% 100%` |
 | `--bg-muted` | `#f0efe8` | `48 14% 94%` |
 | `--bg-hover` | `#f5f4f0` | `48 18% 95%` |
 | `--bg-button` | `#0f0f0e` | `40 7% 6%` |

@@ -24,7 +24,7 @@ from typing import Optional
 LIGHT_TOKENS = {
     "--bg-primary": "#faf9f5",
     "--bg-secondary": "#f0eee6",
-    "--bg-card": "#ffffff",
+    "--bg-card": "#fefdfb",
     "--bg-hover": "#f5f4f0",
     "--bg-muted": "#f0efe8",
     "--bg-button": "#0f0f0e",
@@ -274,7 +274,7 @@ def check_anti_patterns(html: str) -> DimensionScore:
                 if not filtered:
                     continue
             if name == "pure_white_bg_page":
-                # Allow #ffffff for --bg-card (card surface is white)
+                # --bg-card uses warm near-white #fefdfb
                 if all("card" in html[max(0, html.find(m)-80):html.find(m)+80].lower() for m in matches):
                     continue
             if name == "stroke_icon_attr":

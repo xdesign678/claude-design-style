@@ -39,7 +39,7 @@ All 10 tests passed D1 (Token Accuracy) and D2 (Anti-Patterns) at 100%, confirmi
 
 All CSS custom properties match reference values exactly:
 
-- Light mode background tokens (`--bg-primary: #faf9f5`, `--bg-card: #ffffff`, etc.)
+- Light mode background tokens (`--bg-primary: #faf9f5`, `--bg-card: #fefdfb`, etc.)
 - Text tokens (`--text-primary: #141413`, `--text-secondary: #5e5d59`, etc.)
 - Border tokens (correct warm-tinted `rgba(20,20,19,...)` values)
 - Shadow tokens (correct `rgba(0,0,0,0.08/0.12/0.16)` values)

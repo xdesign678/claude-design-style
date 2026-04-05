@@ -36,11 +36,11 @@ Complete color token system for the Anthropic/Claude design style.
   --bg-secondary-hover: #e8e6dc; /* secondary section hover — extracted 2026-04 */
   --bg-hover: #f5f4f0;          /* interactive hover */
   --bg-active: #efeee8;         /* pressed/active state */
-  --bg-card: #ffffff;           /* card/panel surface */
+  --bg-card: #fefdfb;           /* card/panel surface */
   --bg-muted: #f0efe8;          /* code bg, muted sections */
   --bg-button: #0f0f0e;         /* primary button */
   --bg-button-hover: #3d3d3a;   /* primary button hover — extracted 2026-04 */
-  --bg-input: #ffffff;          /* form inputs */
+  --bg-input: #fefdfb;          /* form inputs */
   --bg-overlay: rgba(0,0,0,0.5); /* modal overlay */
 
   /* ── Text ── */
@@ -118,7 +118,7 @@ Complete color token system for the Anthropic/Claude design style.
 | Purpose | Light Mode | Dark Mode | Notes |
 |---------|-----------|-----------|-------|
 | Page background | #faf9f5 | #1a1a18 | Warm tint, never pure |
-| Card surface | #ffffff | #232320 | One step lighter/darker |
+| Card surface | #fefdfb | #232320 | One step lighter/darker |
 | Primary text | #141413 | #ece9e1 | High contrast, warm |
 | Body text | #141413 at 85% | #ece9e1 at 85% | Slightly softer for reading |
 | Secondary text | #5e5d59 | #9b9b95 | Supporting info |

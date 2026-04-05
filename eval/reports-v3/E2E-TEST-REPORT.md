@@ -68,7 +68,7 @@
 
 | 维度 | 分数 | 理由 |
 |------|------|------|
-| C1 配色 | 9/10 | 页面背景 #faf9f5；auth card 用 --bg-card (#ffffff)，与背景形成微妙层次；tab switcher 背景用 --bg-secondary；输入框使用 --bg-card + --border-default；error 状态用 #b85b44（暖砖红，非饱和红 #dc2626），完全符合指南的 validation color 规范。扣 1 分：tab switcher 的 active tab box-shadow 使用 --shadow-sm，在亮色模式下对比度较弱，active/inactive 区分不够清晰。 |
+| C1 配色 | 9/10 | 页面背景 #faf9f5；auth card 用 --bg-card (#fefdfb)，与背景形成微妙层次；tab switcher 背景用 --bg-secondary；输入框使用 --bg-card + --border-default；error 状态用 #b85b44（暖砖红，非饱和红 #dc2626），完全符合指南的 validation color 规范。扣 1 分：tab switcher 的 active tab box-shadow 使用 --shadow-sm，在亮色模式下对比度较弱，active/inactive 区分不够清晰。 |
 | C2 字体 | 9/10 | 页面标题 H1 用 Inter sans-serif；副标题用 --font-reading Lora（体现"scholarly yet approachable"调性）；表单 label、input、button 全用 sans 15px；input font-size:16px（防 iOS zoom）正确。扣 1 分：auth title 的 font-weight:700 对一个登录页稍重，参考图中同类标题更多用 font-weight:600。 |
 | C3 按钮 | 10/10 | 主登录按钮：bg-button + text-on-button + border-radius:7.5px + 15px + min-height:44px（触摸目标）——完全符合规范。OAuth 按钮：transparent + border-default + 7.5px + hover bg-hover。tab switcher 按钮：min-height:44px 保证触摸可及性。所有按钮均无 rounded-full。 |
 | C4 间距 | 8/10 | 表单 card padding:32px；form-group margin-bottom:20px；OAuth button 与 divider 间距合理；整体 main 区居中布局。扣 2 分：auth-container max-width:400px 对宽屏视口偏窄，参考图中类似的集中式 UI 通常有更宽的内容感知（400px card 在 1440px 视口中显得孤立）；form-group 之间间距 20px 稍密，参考图留白更充裕。 |

@@ -1,14 +1,15 @@
 ---
 name: claude-design-style
 description: >
-  Apply the Anthropic/Claude website design aesthetic to any web project.
-  Use when the user explicitly references "Claude style", "Anthropic design",
-  "elegant reading design", "warm minimal design", "literary web design",
-  or asks for a calm, editorial, premium feel inspired by claude.ai or anthropic.com.
-  Also triggers for Chinese: "做成 Claude 风格"、"温暖简约设计"、"文学感网页"、
-  "Anthropic 设计风格"、"阅读体验"、"克制优雅设计".
-  NOT for: data dashboards, e-commerce, game/entertainment, or generic
-  "make it look better" requests without explicit aesthetic direction.
+  Use when building any web page or HTML with a warm, literary, or refined aesthetic.
+  MUST trigger when the user mentions: Claude/Anthropic design style, warm/cream
+  backgrounds (#faf9f5), 温暖简约, 文学感, 克制优雅, Lora/serif body text, or
+  book-publisher quality. Also trigger for requests describing calm editorial
+  typography, warm minimal web design, or premium reading experiences — even without
+  naming Claude explicitly. Covers all page types: landing pages, articles, 404 pages,
+  docs, newsletters, reading UIs. Do NOT trigger for: dashboards, data tables,
+  e-commerce, terminal UIs, Python scripts, CI/CD, or vague requests like
+  "make it pretty" without warmth/literary direction.
 ---
 
 # Claude Design Style
@@ -82,7 +83,7 @@ All design tokens in a single `:root` block. Font tokens (`--font-*`) do not cha
   --bg-secondary: #f0eee6;            /* warm beige sections */
   --bg-hover: #f5f4f0;               /* hover state */
   --bg-active: rgba(20,20,19,0.06);  /* pressed/active state */
-  --bg-card: #ffffff;                 /* card surface */
+  --bg-card: #fefdfb;                 /* card surface */
   --bg-button: #0f0f0e;              /* primary button — near-black */
   --bg-button-hover: #3d3d3a;        /* primary button hover */
   --bg-muted: #f0efe8;               /* muted sections, code bg */
@@ -172,7 +173,7 @@ See [references/colors.md](references/colors.md) for full token list and Tailwin
 | Body text | Serif | 17px (1.0625rem) | 400 | 1.6 | normal |
 | H1 (hero) | Sans | clamp(2.5rem,...,4rem) | 700 | 1.1 | -0.02em |
 | H2 (section) | Sans | clamp(1.75rem,...,2.5rem) | 600 | 1.2 | -0.01em |
-| H3 (subsection) | Sans | clamp(1.25rem,...,1.75rem) | 600 | 1.3 | normal |
+| H3 (subsection) | Sans | clamp(1.25rem,...,1.75rem) | 600 | 1.3 | normal | ← must be ≥3px larger than body (20px+ min) |
 | Nav/UI | Sans | 15px | 400 | 1.5 | normal |
 | Button | Sans | 15px | 400 | 1.5 | normal |
 | Small/label | Sans | 12px | 500 | 1.4 | 0.05em (uppercase) |
@@ -317,6 +318,8 @@ See [references/motion.md](references/motion.md) for keyframes and animation pat
 }
 ```
 
+**Equal-height card grids** (pricing, features): Use `display: grid` with equal columns and `align-items: stretch` (not `start`). Place the CTA button at the bottom with `margin-top: auto` inside a flex column, so buttons align even when content lengths differ.
+
 **Card Hover Dimming** (sibling awareness):
 
 ```css
@@ -378,6 +381,8 @@ input:focus, textarea:focus {
   box-shadow: 0 0 0 2px rgba(94,93,89,0.15);
 }
 ```
+
+**Form semantics**: Always wrap form inputs in a `<form>` element with `action` and `method`. Use `<button type="submit">` (not `type="button"`) for the primary submit action — this enables native Enter-key submission and password manager autofill. Add `autocomplete` attributes on login/register inputs (`username`, `current-password`, `new-password`).
 
 ### Navigation
 
@@ -441,9 +446,10 @@ prose-hr:border-[var(--border-section)]
 - Thick borders (>1px) or colored borders
 - Stroked/outline icons — use filled with currentColor
 - Heavy animations, bounces, spring physics
+- `display:none → display:block/grid` for animated menus — `display` is not animatable, transitions on height/opacity/grid-template-rows won't fire. Keep `display:grid` always and animate `grid-template-rows: 0fr → 1fr`, or use `max-height`/`opacity` instead
 - Dense layouts — minimum 32px between content blocks, minimum 16px between paragraphs
 - Colored links (blue, green, purple, etc.) — links use `color: inherit` and are distinguished only by underline opacity
-- Saturated validation colors — never `#dc2626`, `#f87171` (error) or `#16a34a`, `#4ade80` (success); use warm brick `#b85b44` and muted sage `#5a856a` instead
+- Saturated validation colors — never `#dc2626`, `#f87171` (error) or `#16a34a`, `#4ade80` (success); use warm tones: error = `#b85b44` (light) / `#d4826a` (dark), success = `#5a856a` (light) / `#7aab87` (dark), warning = `#c4834a` (light) / `#d4a06a` (dark). Define CSS variables `--state-error`, `--state-success`, `--state-warning` so dark mode overrides work automatically.
 - `.dark {}` CSS block before `:root {}` — same specificity (0,1,0), `:root` wins if it comes last; always put `.dark` AFTER `:root`
 - Emojis in UI text (casual/playful aesthetic conflicts with literary tone)
 - Cool-toned `::selection` highlight — use `rgba(204,120,92,0.5)` (warm clay)
