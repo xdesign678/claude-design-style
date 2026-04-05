@@ -33,7 +33,7 @@ This system emphasizes warm minimalism, typographic clarity, generous whitespace
    - Empty states, Skeleton, Toast, error pages → `references/states.md`
    - shadcn/ui theme config → `references/shadcn.md`
 4. **Apply styles** — Start with `:root` CSS variables, then components, then spacing.
-5. **Validate** with Quick Checklist (28 items) before finishing.
+5. **MANDATORY: Run 3-Pass Validation Scan** (see below) — scan your generated code, fix every violation found. Do NOT skip this step.
 
 **Restyle mode** (existing code): Introduce `:root` variables first → scan for Anti-Pattern violations → replace colors → replace fonts → adjust spacing. Preserve all HTML structure and logic.
 
@@ -449,38 +449,52 @@ prose-hr:border-[var(--border-section)]
 - Cool-toned `::selection` highlight — use `rgba(204,120,92,0.5)` (warm clay)
 - Using `--text-tertiary` for essential information — its 2.4:1 contrast is decorative-only
 
-## Quick Checklist
+## 3-Pass Validation Scan (MANDATORY)
 
-When applying this style, verify:
+After generating or modifying code, you MUST scan it in 3 passes. For each item, **search your generated code** for the specific pattern described. If missing or wrong, **fix it before outputting**. Do NOT skip any pass.
 
-1. [ ] Background is warm cream (#faf9f5), not white
-2. [ ] Text is warm near-black (#141413), not #000
-3. [ ] Body text uses **serif** font (Lora or equivalent)
-4. [ ] Headings/UI use **sans-serif** font (Geist/Inter)
-5. [ ] Content max-width: 640px (reading) or 768-840px (app)
-6. [ ] Line-height 1.6 for body, 1.1-1.3 for headings
-7. [ ] Buttons: `border-radius: 7.5px`, dark bg (#0f0f0e), cream text
-8. [ ] Links: same-color text, subtle underline (offset 0.2em)
-9. [ ] Borders: rgba(20,20,19,0.08-0.12), warm-tinted, barely visible
-10. [ ] Shadows: 8-16% opacity max
-11. [ ] Icons: 16px, filled (currentColor)
-12. [ ] No gradients, no textures
-13. [ ] Generous whitespace on 8px grid
-14. [ ] Transitions: 150-300ms ease
-15. [ ] Nav height: 68px with 1px bottom border
-16. [ ] Selection highlight uses warm clay tone (rgba(204,120,92,0.5))
-17. [ ] Card grids use sibling-dimming on hover
-18. [ ] Typography uses fluid clamp() for responsive scaling
-19. [ ] Pricing featured cards use color inversion (dark bg + cream CTA)
-20. [ ] **Dark mode**: bg `#1a1a18`, text `#ece9e1`, buttons inverted
-21. [ ] **Dark mode CSS ordering**: `.dark {}` block comes AFTER `:root {}` (same specificity 0,1,0 — later wins). Never put `.dark` before `:root` or dark mode variables will be silently overridden
-22. [ ] **Validation colors**: use warm brand-aligned tones — error `#b85b44` (light) / `#d4826a` (dark), success `#5a856a` (light) / `#7aab87` (dark). Never use saturated `#dc2626`, `#f87171`, `#16a34a`, `#4ade80`
-23. [ ] **Mobile**: `<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">`
-24. [ ] **Mobile**: all touch targets >= 44px (buttons, checkboxes, links)
-25. [ ] **Mobile**: inputs use `font-size: 16px` to prevent iOS zoom
-26. [ ] **Mobile**: fixed-bottom elements respect `env(safe-area-inset-bottom)`
-27. [ ] **Mobile**: nav collapses to hamburger below 768px
-28. [ ] `prefers-reduced-motion` disables all animations
+### Pass 1 — Dark Mode & Color Integrity (most commonly missed)
+
+Scan your CSS/style output and verify:
+
+1. **`.dark {}` block exists** — search for `.dark` or `[data-theme="dark"]`. If missing and the page has any interactive/display content, add the full dark mode variable block.
+2. **CSS ordering: `.dark {}` AFTER `:root {}`** — same specificity (0,1,0), later wins. If `.dark` appears before `:root`, dark mode is silently broken. Move it after.
+3. **Dark backgrounds are warm** — `--bg-primary` in `.dark` must be `#1a1a18` (warm charcoal), NOT `#1a1a1a`, `#111`, `#000`, or any cool gray.
+4. **Dark text is warm off-white** — `--text-primary` in `.dark` must be `#ece9e1`, NOT `#fff`, `#f5f5f5`, or cool white.
+5. **Buttons invert in dark mode** — `--bg-button` in `.dark` = `#ece9e1`, `--text-on-button` = `#1a1a18`.
+6. **No `#fff` or `#000` anywhere** — search for `#fff`, `#ffffff`, `#000`, `#000000`. Replace with nearest warm token.
+7. **No cool grays** — search for `#f5f5f5`, `#e5e5e5`, `#333`, `#666`, `#999`, `#ccc`. Replace with `var(--bg-*)` / `var(--text-*)` tokens.
+8. **No saturated validation colors** — search for `#dc2626`, `#ef4444`, `#f87171`, `#16a34a`, `#4ade80`, literal `red`, `green`. Replace: error = `#b85b44` (light) / `#d4826a` (dark), success = `#5a856a` (light) / `#7aab87` (dark).
+9. **`::selection` warm clay** — search for `::selection`. Must use `rgba(204,120,92,0.5)`. If missing, add it.
+10. **Dark link underlines** — if `<a>` tags exist, search for `.dark a`. Underline color must be `rgba(236,233,225,0.3)`, not the light-mode value (invisible on dark bg).
+
+### Pass 2 — Typography & Spacing (second most missed)
+
+11. **Body font is serif** — search for `font-family` on `body`/`p`. Must include `Lora` or serif stack. Exception: pure marketing landing pages may use sans body.
+12. **Headings are sans-serif** — search for `font-family` on `h1`–`h6`. Must include `Geist`/`Inter`/sans stack.
+13. **H1 uses `clamp()`** — search for `h1` font-size. Must use `clamp(2.5rem, ..., 4rem)` or similar fluid value, NOT a fixed `px`/`rem`.
+14. **H2 has `letter-spacing: -0.01em`** — search for `h2`. Add if missing.
+15. **Body line-height is 1.6** — search for body/paragraph `line-height`. Must be `1.6`, not `1.5` or `1.75`.
+16. **Content max-width constrained** — search for `max-width` on main content. ~`640px` (reading) or `768–840px` (app), NOT full-width or `1200px`.
+17. **Section gaps >= 64px** — search for `<section>` padding/margin. Top/bottom >= 64px (`py-16`+), not 32px or 40px.
+18. **Paragraph gap 16–20px** — search for `p` margin-bottom. Not 8px or 24px+.
+19. **Nav height 68px** — search for `nav` height. Must be `68px` / `4.25rem`.
+20. **Button radius 7.5px** — search for button `border-radius`. Must be `7.5px`, NOT `rounded-full`/`9999px`, NOT `8px` (cards only).
+
+### Pass 3 — Components, Mobile & Accessibility (polish layer)
+
+21. **Links: `color: inherit` + underline only** — search for `a` styles. NO `color: blue`/`color: var(--brand-*)`. Distinguished only by `text-decoration` with `text-underline-offset: 0.2em`.
+22. **Card sibling dimming** — if card grid exists, search for `:has(.card:hover)`. Missing? Add `.card-grid:has(.card:hover) .card:not(:hover) { opacity: 0.6; }`.
+23. **Borders warm-tinted** — search for `border-color`/`border:`. Must use `rgba(20,20,19, 0.06–0.12)` or `var(--border-*)`, NOT `#e5e7eb`, `#d1d5db`, or Tailwind default grays.
+24. **Input font-size 16px** — search for `input`/`textarea` font-size. Must be `16px` (prevents iOS zoom). NOT `14px`/`15px`.
+25. **Touch targets >= 44px** — search for button/checkbox/link sizing. Interactive elements need 44px minimum tap area.
+26. **Viewport meta** — search for `<meta name="viewport"`. Must include `width=device-width, initial-scale=1.0`. Add `viewport-fit=cover` for fixed-bottom elements.
+27. **Responsive nav** — if nav exists, must collapse to hamburger/mobile menu below `768px`. Search for nav-related `@media`.
+28. **`prefers-reduced-motion`** — search for `prefers-reduced-motion`. If missing and page has transitions/animations, add the media query.
+29. **No gradients** — search for `linear-gradient`, `radial-gradient`. Remove from backgrounds/buttons.
+30. **Shadows subtle** — search for `box-shadow`. Max opacity 16% (`rgba(0,0,0,0.08–0.16)`). No `0.3+`.
+
+**If any item fails: fix it in your code, then re-check that item. Do not output until all 30 items pass.**
 
 ## Reference Files
 
