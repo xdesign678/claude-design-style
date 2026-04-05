@@ -128,7 +128,7 @@ Star icon + "Claude" text side by side.
 ```css
 --brand-clay: #d97757;
 --brand-clay-light: #e8a48b;     /* 30% lighter, for subtle bg tints */
---brand-clay-dark: #c46849;      /* darker variant */
+--brand-clay-dark: #c6613f;      /* darker variant — matches --brand-clay-hover in colors.md */
 --brand-clay-10: rgba(217,119,87,0.10); /* very subtle bg wash */
 --brand-clay-20: rgba(217,119,87,0.20); /* light highlight */
 ```

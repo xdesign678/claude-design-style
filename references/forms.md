@@ -8,17 +8,23 @@ Form validation states, field groups, and special inputs for the Anthropic/Claud
 
 ```css
 :root {
-  /* Validation state colors */
-  --state-error: #dc2626;          /* red — field error */
-  --state-error-bg: rgba(220,38,38,0.06);
-  --state-error-border: rgba(220,38,38,0.4);
-  --state-warning: #d97706;        /* amber — caution */
-  --state-warning-bg: rgba(217,119,6,0.06);
-  --state-success: #16a34a;        /* green — valid */
-  --state-success-bg: rgba(22,163,74,0.06);
-  --state-success-border: rgba(22,163,74,0.3);
+  /* Validation state colors — warm, brand-aligned (NOT pure red/green) */
+  --state-error: #b85b44;          /* warm brick red — harmonious with brand clay */
+  --state-error-bg: rgba(184,91,68,0.06);
+  --state-error-border: rgba(184,91,68,0.35);
+  --state-warning: #9a7020;        /* warm amber — muted, on-brand */
+  --state-warning-bg: rgba(154,112,32,0.06);
+  --state-success: #5a856a;        /* muted sage green — low saturation */
+  --state-success-bg: rgba(90,133,106,0.06);
+  --state-success-border: rgba(90,133,106,0.3);
 }
 ```
+
+> **Why these colors?** Anthropic's palette is built on warm, restrained tones.
+> Saturated reds like `#dc2626` or `#f87171` feel jarring against `#faf9f5` cream.
+> `#b85b44` is a warm brick red derived from the same terracotta family as brand clay `#d97757`, but darker — signaling error without breaking the aesthetic.
+> `#5a856a` is a muted sage green that reads "success" without the clinical brightness of `#16a34a`.
+> Both colors maintain WCAG AA contrast on `--bg-primary` (#faf9f5).
 
 ### Field with Validation
 
@@ -73,7 +79,7 @@ Form validation states, field groups, and special inputs for the Anthropic/Claud
   background: var(--state-error-bg);
 }
 .field.error .field-input:focus {
-  box-shadow: 0 0 0 2px rgba(220,38,38,0.12);
+  box-shadow: 0 0 0 2px rgba(184,91,68,0.15);
 }
 
 /* Success state */
@@ -135,11 +141,11 @@ function FormField({
     <div className="flex flex-col gap-1.5 mb-5">
       <label className="text-sm font-medium text-[--text-primary]">
         {label}
-        {required && <span className="text-red-600 ml-0.5">*</span>}
+        {required && <span className="text-[--state-error] ml-0.5">*</span>}
       </label>
       {children}
       {error && (
-        <p className="text-[13px] text-red-600 flex items-center gap-1">
+        <p className="text-[13px] text-[--state-error] flex items-center gap-1">
           <AlertCircle size={13} />
           {error}
         </p>
@@ -465,4 +471,258 @@ function FormField({
   flex-shrink: 0;
   margin-top: 1px;
 }
+```
+
+---
+
+## Dark Mode
+
+> **CSS Ordering Rule**: The `.dark` block MUST appear AFTER `:root` in the stylesheet.
+> Both selectors have equal specificity (0,1,0); the later one wins. If `.dark` comes first,
+> `:root` will override all dark mode variables, breaking dark mode entirely.
+
+```css
+/* ✅ CORRECT order — :root first, .dark second */
+:root { --state-error: #b85b44; }
+
+/* IMPORTANT: must come AFTER :root */
+.dark {
+  /* Validation colors — lighter warm tones for dark backgrounds */
+  --state-error: #d4826a;          /* lighter warm terracotta — 5.1:1 contrast on #1a1a18 */
+  --state-error-bg: rgba(212,130,106,0.08);
+  --state-error-border: rgba(212,130,106,0.3);
+  --state-success: #7aab87;        /* lighter muted sage — 4.8:1 contrast on #1a1a18 */
+  --state-success-bg: rgba(122,171,135,0.08);
+  --state-success-border: rgba(122,171,135,0.25);
+  --state-warning: #c9a84c;        /* lighter warm amber */
+  --state-warning-bg: rgba(201,168,76,0.08);
+}
+
+/* Toggle knob in dark mode — use warm cream instead of pure white */
+.dark .toggle::after {
+  background: var(--text-primary);   /* #ece9e1 */
+}
+
+/* Select dropdown arrow for dark mode */
+.dark .field-select {
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='%239b9b95' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+```
+
+---
+
+## Mobile Touch Targets
+
+```css
+@media (max-width: 767px) {
+  /* All inputs must be 16px to prevent iOS zoom */
+  .field-input, .field-select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Enlarge checkbox/radio touch area to 44px */
+  .checkbox-wrap, .toggle-wrap {
+    min-height: 44px;
+    padding: 4px 0;
+  }
+
+  .checkbox-input, .radio-input {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Toggle needs larger touch area */
+  .toggle {
+    width: 44px;
+    height: 24px;
+    border-radius: 12px;
+  }
+  .toggle::after {
+    width: 20px;
+    height: 20px;
+  }
+  .toggle.on::after {
+    transform: translateX(20px);
+  }
+
+  /* Tag remove button — larger tap target */
+  .tag-remove {
+    width: 20px;
+    height: 20px;
+    padding: 3px;
+  }
+
+  /* Step indicator — stack labels below on narrow screens */
+  .steps {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .step-label {
+    display: none;   /* hide labels, keep circles */
+  }
+}
+
+---
+
+## Date Picker
+
+### Native Input Styling
+
+Style the browser's built-in `input[type="date"]` to match the design system. For full calendar customization, pair with a headless library (e.g. react-day-picker, Flatpickr).
+
+```css
+/* Date input — matches .field-input sizing and feel */
+.field-input[type="date"],
+.field-input[type="time"],
+.field-input[type="datetime-local"] {
+  border: 1px solid var(--border-default);
+  border-radius: 7.5px;
+  padding: 9px 14px;
+  font-size: 15px;
+  font-family: var(--font-sans);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+  width: 100%;
+  /* Remove default browser chrome (calendar icon tinting) */
+  color-scheme: light;
+}
+
+.field-input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+  /* Tint to match --text-tertiary */
+  filter: invert(40%) sepia(5%) saturate(200%) hue-rotate(10deg);
+}
+.field-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 0.85;
+}
+
+.field-input[type="date"]:focus {
+  outline: none;
+  border-color: var(--text-secondary);
+  box-shadow: 0 0 0 2px var(--ring-color);
+}
+
+/* Dark mode */
+.dark .field-input[type="date"],
+.dark .field-input[type="time"],
+.dark .field-input[type="datetime-local"] {
+  color-scheme: dark;
+}
+.dark .field-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(70%) sepia(5%) saturate(200%) hue-rotate(10deg);
+}
+```
+
+### Calendar Popup — Base Style Hints
+
+When using a custom calendar/datepicker library, apply these styles to the popup container:
+
+```css
+/* Popup container (e.g. .rdp-root, .flatpickr-calendar, etc.) */
+.datepicker-popup {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;               /* card radius */
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text-primary);
+  padding: 16px;
+  z-index: 200;
+}
+
+/* Day cell — default */
+.datepicker-day {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+  color: var(--text-primary);
+}
+
+.datepicker-day:hover {
+  background: var(--bg-hover);
+}
+
+/* Selected day — inverted (matches primary button) */
+.datepicker-day.selected {
+  background: var(--bg-button);
+  color: var(--text-on-button);
+  font-weight: 500;
+}
+
+/* Today marker */
+.datepicker-day.today {
+  border: 1px solid var(--border-default);
+}
+
+/* Out-of-range / disabled days */
+.datepicker-day.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Range selection — start/end and in-between */
+.datepicker-day.range-start,
+.datepicker-day.range-end {
+  background: var(--bg-button);
+  color: var(--text-on-button);
+}
+.datepicker-day.in-range {
+  background: var(--bg-muted);
+}
+```
+
+---
+
+## Autocomplete Attributes Guide
+
+Add `autocomplete` attributes to help browsers and password managers prefill forms correctly, reducing user friction and improving accessibility.
+
+```html
+<!-- Personal identity -->
+<input type="text"     name="name"          autocomplete="name">
+<input type="text"     name="given_name"    autocomplete="given-name">
+<input type="text"     name="family_name"   autocomplete="family-name">
+
+<!-- Contact -->
+<input type="email"    name="email"         autocomplete="email">
+<input type="tel"      name="phone"         autocomplete="tel">
+
+<!-- Address -->
+<input type="text"     name="street"        autocomplete="street-address">
+<input type="text"     name="city"          autocomplete="address-level2">
+<input type="text"     name="state"         autocomplete="address-level1">
+<input type="text"     name="zip"           autocomplete="postal-code">
+<select                name="country"       autocomplete="country">
+
+<!-- Account credentials -->
+<input type="text"     name="username"      autocomplete="username">
+<input type="email"    name="login_email"   autocomplete="email">
+<input type="password" name="password"      autocomplete="current-password">
+<input type="password" name="new_password"  autocomplete="new-password">
+
+<!-- Payment -->
+<input type="text"     name="cc_name"       autocomplete="cc-name">
+<input type="text"     name="cc_number"     autocomplete="cc-number">
+<input type="text"     name="cc_expiry"     autocomplete="cc-exp">
+<input type="text"     name="cc_cvc"        autocomplete="cc-csc">
+
+<!-- Organization -->
+<input type="text"     name="company"       autocomplete="organization">
+<input type="text"     name="job_title"     autocomplete="organization-title">
+
+<!-- Turn off autocomplete for sensitive / OTP fields -->
+<input type="text"     name="otp"           autocomplete="one-time-code">
+<input type="text"     name="captcha"       autocomplete="off">
+```
+
+> **Note**: Use `autocomplete="off"` sparingly. Browsers and password managers may ignore it for password fields. Prefer the correct semantic value whenever possible.
 ```

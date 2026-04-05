@@ -36,7 +36,7 @@ Replace the default shadcn globals.css `:root` and `.dark` blocks with this:
     --primary-foreground: 48 33% 97%;   /* #faf9f5 */
 
     /* ── Secondary (ghost/muted button) ── */
-    --secondary: 48 14% 94%;            /* #f0efe8 */
+    --secondary: 48 14% 94%;            /* #f0eee6 — maps to --bg-secondary */
     --secondary-foreground: 40 7% 8%;
 
     /* ── Muted (badges, code bg) ── */
@@ -48,12 +48,12 @@ Replace the default shadcn globals.css `:root` and `.dark` blocks with this:
     --accent-foreground: 40 7% 8%;
 
     /* ── Destructive ── */
-    --destructive: 0 72% 51%;           /* #dc2626 */
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 13 39% 50%;          /* #b85b44 — warm brick red, brand-aligned */
+    --destructive-foreground: 48 33% 97%; /* #faf9f5 — warm cream on dark */
 
     /* ── Border ── */
-    --border: 40 8% 91%;                /* ~rgba(0,0,0,0.08) approx */
-    --input: 40 8% 88%;                 /* ~rgba(0,0,0,0.12) approx */
+    --border: 40 8% 91%;                /* ~rgba(20,20,19,0.08) approx */
+    --input: 40 8% 88%;                 /* ~rgba(20,20,19,0.12) approx */
     --ring: 41 5% 36%;                  /* #5e5d59 */
 
     /* ── Brand ── */
@@ -85,8 +85,8 @@ Replace the default shadcn globals.css `:root` and `.dark` blocks with this:
     --accent: 40 5% 16%;
     --accent-foreground: 48 14% 92%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 16 55% 62%;          /* #d4826a — lighter warm terracotta for dark bg */
+    --destructive-foreground: 40 5% 10%; /* #1a1a18 — dark bg for contrast */
 
     --border: 48 14% 92% / 0.10;
     --input: 48 14% 92% / 0.12;
@@ -307,6 +307,8 @@ const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
 | `--text-primary` | `#141413` | `40 7% 8%` |
 | `--text-secondary` | `#5e5d59` | `41 5% 36%` |
 | `--text-tertiary` | `#b0aea5` | `42 5% 67%` |
-| `--border-light` | `rgba(0,0,0,0.08)` | `0 0% 0% / 8%` |
-| `--border-default` | `rgba(0,0,0,0.12)` | `0 0% 0% / 12%` |
+| `--border-light` | `rgba(20,20,19,0.08)` | `40 7% 8% / 8%` |
+| `--border-default` | `rgba(20,20,19,0.12)` | `40 7% 8% / 12%` |
 | `--brand-clay` | `#d97757` | `18 62% 64%` |
+| `--state-error` (light) | `#b85b44` | `13 39% 50%` |
+| `--state-error` (dark) | `#d4826a` | `16 55% 62%` |

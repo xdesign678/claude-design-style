@@ -34,7 +34,7 @@ With Artifacts (>= 1280px):
 --sidebar-padding: 16px;
 --chat-max-width: 768px;
 --chat-padding: 32px;
---header-height: 64px;
+--header-height: var(--nav-height, 68px);  /* inherits from layout.md --nav-height */
 --input-min-height: 56px;
 --input-max-height: 200px;
 ```
@@ -408,10 +408,10 @@ With Artifacts (>= 1280px):
   background: var(--border-section);
 }
 .resize-handle:hover {
-  background: var(--brand-clay);
+  background: var(--text-tertiary);
 }
 .resize-handle:hover::after {
-  background: var(--brand-clay);
+  background: var(--text-tertiary);
 }
 ```
 
@@ -428,7 +428,12 @@ With Artifacts (>= 1280px):
   border-radius: 1px;
   margin-left: 1px;
   vertical-align: text-bottom;
-  animation: cursor-pulse 1s ease-in-out infinite;
+  animation: cursor-blink 1s ease-in-out infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* Thinking dots (before response starts) */

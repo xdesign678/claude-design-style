@@ -21,7 +21,7 @@ This system emphasizes warm minimalism, typographic clarity, generous whitespace
 
 1. **Understand the task** — Is this "create from scratch" or "restyle existing code"? Full redesign or targeted component?
 2. **Identify the stack** — Tailwind/React → use Tailwind classes + CSS variables. Plain HTML/CSS → use CSS variables + native CSS. Unknown → default to CSS variables (most portable).
-3. **Load reference files on demand** (do NOT load all 7 at once):
+3. **Load reference files on demand** (do NOT load all 10 at once):
    - Color tokens → `references/colors.md`
    - Font loading + type scale → `references/typography.md`
    - Complex components (modal, code block, tabs) → `references/components.md`
@@ -33,7 +33,7 @@ This system emphasizes warm minimalism, typographic clarity, generous whitespace
    - Empty states, Skeleton, Toast, error pages → `references/states.md`
    - shadcn/ui theme config → `references/shadcn.md`
 4. **Apply styles** — Start with `:root` CSS variables, then components, then spacing.
-5. **Validate** with Quick Checklist (18 items) before finishing.
+5. **Validate** with Quick Checklist (28 items) before finishing.
 
 **Restyle mode** (existing code): Introduce `:root` variables first → scan for Anti-Pattern violations → replace colors → replace fonts → adjust spacing. Preserve all HTML structure and logic.
 
@@ -72,12 +72,12 @@ Anthropic operates two distinct design contexts:
 
   /* Backgrounds */
   --bg-primary: #faf9f5;              /* warm cream page background */
-  --bg-secondary: #f9f9f7;            /* slightly cooler cream */
+  --bg-secondary: #f0eee6;            /* warm beige sections */
   --bg-hover: #f5f4f0;               /* hover state */
+  --bg-active: rgba(20,20,19,0.06);  /* pressed/active state */
   --bg-card: #ffffff;                 /* card surface */
   --bg-button: #0f0f0e;              /* primary button — near-black */
-  --bg-button-hover: #2a2a27;        /* primary button hover */
-  --bg-active: #efeee8;              /* pressed/active state */
+  --bg-button-hover: #3d3d3a;        /* primary button hover */
   --bg-muted: #f0efe8;               /* muted sections, code bg */
 
   /* Text */
@@ -87,10 +87,13 @@ Anthropic operates two distinct design contexts:
   --text-tertiary: #b0aea5;           /* captions, timestamps — decorative only, 2.4:1 contrast */
   --text-on-button: #faf9f5;          /* text on dark buttons */
 
+  /* Typography */
+  --font-reading: Lora, "Noto Serif SC", Georgia, "Times New Roman", serif;
+
   /* Borders */
-  --border-light: rgba(0,0,0,0.08);   /* card borders */
-  --border-default: rgba(0,0,0,0.12); /* input borders */
-  --border-section: rgba(0,0,0,0.06); /* section dividers */
+  --border-light: rgba(20,20,19,0.08);   /* card borders — warm-tinted */
+  --border-default: rgba(20,20,19,0.12); /* input borders — warm-tinted */
+  --border-section: rgba(20,20,19,0.06); /* section dividers — warm-tinted */
 
   /* Shadows (very subtle) */
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
@@ -106,11 +109,14 @@ Anthropic operates two distinct design contexts:
   --bg-primary: #1a1a18;              /* warm charcoal */
   --bg-secondary: #232320;
   --bg-hover: #2a2a27;
+  --bg-active: rgba(236,233,225,0.08); /* pressed/active state */
   --bg-card: #232320;
   --bg-button: #ece9e1;              /* inverted — light button */
+  --bg-button-hover: #d4d1c9;       /* inverted button hover */
   --bg-muted: #2a2a27;
 
   --text-primary: #ece9e1;            /* warm off-white */
+  --text-body: rgba(236,233,225,0.85); /* body text at 85% */
   --text-secondary: #9b9b95;
   --text-tertiary: #6b6b66;
   --text-on-button: #1a1a18;
@@ -255,7 +261,7 @@ See [references/motion.md](references/motion.md) for keyframes and animation pat
 ```css
 .card {
   background: var(--bg-card);
-  border: 1px solid var(--border-light);  /* rgba(0,0,0,0.08) */
+  border: 1px solid var(--border-light);  /* rgba(20,20,19,0.08) */
   border-radius: 8px;
   padding: 24px;
   box-shadow: none;                       /* flat by default */
@@ -360,8 +366,8 @@ prose-h3:mt-10 prose-h3:mb-4
 prose-p:mb-4 prose-p:leading-relaxed
 prose-a:text-inherit prose-a:underline prose-a:underline-offset-2
 prose-a:decoration-foreground/30 hover:prose-a:decoration-foreground/60
-prose-blockquote:border-foreground/15 prose-blockquote:not-italic
-prose-blockquote:text-[var(--text-secondary)] prose-blockquote:pl-6
+prose-blockquote:border-foreground prose-blockquote:border-l prose-blockquote:not-italic
+prose-blockquote:text-[var(--text-secondary)] prose-blockquote:pl-4
 prose-code:bg-[var(--bg-muted)] prose-code:px-1.5 prose-code:py-0.5
 prose-code:rounded prose-code:text-[0.9em]
 prose-code:before:content-none prose-code:after:content-none
@@ -384,6 +390,8 @@ prose-hr:border-[var(--border-section)]
 - Heavy animations, bounces, spring physics
 - Dense layouts — minimum 32px between content blocks, minimum 16px between paragraphs
 - Colored links (blue, green, purple, etc.) — links use `color: inherit` and are distinguished only by underline opacity
+- Saturated validation colors — never `#dc2626`, `#f87171` (error) or `#16a34a`, `#4ade80` (success); use warm brick `#b85b44` and muted sage `#5a856a` instead
+- `.dark {}` CSS block before `:root {}` — same specificity (0,1,0), `:root` wins if it comes last; always put `.dark` AFTER `:root`
 - Emojis in UI text (casual/playful aesthetic conflicts with literary tone)
 - Cool-toned `::selection` highlight — use `rgba(204,120,92,0.5)` (warm clay)
 - Using `--text-tertiary` for essential information — its 2.4:1 contrast is decorative-only
@@ -400,7 +408,7 @@ When applying this style, verify:
 6. [ ] Line-height 1.6 for body, 1.1-1.3 for headings
 7. [ ] Buttons: `border-radius: 7.5px`, dark bg (#0f0f0e), cream text
 8. [ ] Links: same-color text, subtle underline (offset 0.2em)
-9. [ ] Borders: rgba(0,0,0,0.08-0.12), barely visible
+9. [ ] Borders: rgba(20,20,19,0.08-0.12), warm-tinted, barely visible
 10. [ ] Shadows: 8-16% opacity max
 11. [ ] Icons: 16px, filled (currentColor)
 12. [ ] No gradients, no textures
@@ -410,6 +418,16 @@ When applying this style, verify:
 16. [ ] Selection highlight uses warm clay tone (rgba(204,120,92,0.5))
 17. [ ] Card grids use sibling-dimming on hover
 18. [ ] Typography uses fluid clamp() for responsive scaling
+19. [ ] Pricing featured cards use color inversion (dark bg + cream CTA)
+20. [ ] **Dark mode**: bg `#1a1a18`, text `#ece9e1`, buttons inverted
+21. [ ] **Dark mode CSS ordering**: `.dark {}` block comes AFTER `:root {}` (same specificity 0,1,0 — later wins). Never put `.dark` before `:root` or dark mode variables will be silently overridden
+22. [ ] **Validation colors**: use warm brand-aligned tones — error `#b85b44` (light) / `#d4826a` (dark), success `#5a856a` (light) / `#7aab87` (dark). Never use saturated `#dc2626`, `#f87171`, `#16a34a`, `#4ade80`
+23. [ ] **Mobile**: `<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">`
+24. [ ] **Mobile**: all touch targets >= 44px (buttons, checkboxes, links)
+25. [ ] **Mobile**: inputs use `font-size: 16px` to prevent iOS zoom
+26. [ ] **Mobile**: fixed-bottom elements respect `env(safe-area-inset-bottom)`
+27. [ ] **Mobile**: nav collapses to hamburger below 768px
+28. [ ] `prefers-reduced-motion` disables all animations
 
 ## Reference Files
 

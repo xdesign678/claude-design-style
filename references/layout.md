@@ -177,16 +177,29 @@ Grid system, responsive design, and page structure for the Anthropic/Claude desi
 ## Responsive Breakpoints
 
 ```css
-/* Anthropic.com actual breakpoints (from research) */
---bp-mobile-sm: 479px;   /* small mobile */
---bp-tablet: 600px;       /* tablets */
---bp-desktop: 896px;      /* desktop (56em) — nav switches to hamburger */
+:root {
+  /* Anthropic.com actual breakpoints (from research) */
+  --bp-mobile-sm: 479px;   /* small mobile */
+  --bp-tablet: 600px;       /* tablets */
+  --bp-desktop: 896px;      /* desktop (56em) — marketing site wide layout */
 
-/* Claude.ai app breakpoints (existing) */
---bp-sm: 640px;
---bp-md: 768px;
---bp-lg: 1024px;
---bp-xl: 1280px;
+  /* Claude.ai app breakpoints */
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+}
+
+/*
+ * Note: CSS custom properties cannot be used directly in @media queries.
+ * Use these values as a reference. For media queries, use the literal values:
+ *   @media (min-width: 640px)  — sm
+ *   @media (min-width: 768px)  — md
+ *   @media (min-width: 1024px) — lg
+ *   @media (min-width: 1280px) — xl
+ * Or use @custom-media (CSS Level 5, requires PostCSS plugin):
+ *   @custom-media --screen-sm (min-width: 640px);
+ */
 ```
 
 **Note:** Anthropic's marketing site uses fewer, wider breakpoints and relies heavily on fluid clamp() values, while the Claude app uses more granular breakpoints for the complex sidebar+chat+artifact layout.
@@ -195,9 +208,9 @@ Grid system, responsive design, and page structure for the Anthropic/Claude desi
 
 | Breakpoint | Nav | Sidebar | Content Width | Layout |
 |-----------|-----|---------|---------------|--------|
-| < 479px | 56px, hamburger | Hidden | 100% | Single column, compressed |
-| 480-599px | 56px, hamburger | Hidden (drawer) | 100% | Single column |
-| 600-767px | 56px, hamburger | Hidden (drawer) | 100% | Single column |
+| < 479px | 56px, hamburger (< 768px) | Hidden | 100% | Single column, compressed |
+| 480-599px | 56px, hamburger (< 768px) | Hidden (drawer) | 100% | Single column |
+| 600-767px | 56px, hamburger (< 768px) | Hidden (drawer) | 100% | Single column |
 | 768-895px | 68px | Collapsible | max 640/768px | 1-2 columns |
 | 896-1023px | 68px | Collapsible | max 640/768px | Sidebar + content |
 | 1024-1279px | 68px | Fixed 260-280px | max 640/768px | Sidebar + content |
@@ -306,6 +319,190 @@ Grid system, responsive design, and page structure for the Anthropic/Claude desi
 .drawer-overlay.active {
   opacity: 1;
   visibility: visible;
+}
+```
+
+## Mobile-First Essentials
+
+Every page generated with this design system MUST include these mobile foundations.
+
+### Viewport Meta
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+```
+
+### Safe Areas (Notch / Dynamic Island / Home Indicator)
+
+```css
+:root {
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-left: env(safe-area-inset-left);
+  --safe-right: env(safe-area-inset-right);
+}
+
+/* Fixed bottom elements must respect home indicator */
+.fixed-bottom {
+  padding-bottom: calc(16px + var(--safe-bottom));
+}
+
+/* Full-bleed layouts must respect notch */
+.full-bleed {
+  padding-left: max(var(--site-margin), var(--safe-left));
+  padding-right: max(var(--site-margin), var(--safe-right));
+}
+```
+
+### Touch Targets
+
+```css
+/* Minimum 44x44px touch targets (Apple HIG / WCAG) */
+button, a, [role="button"], input[type="checkbox"], input[type="radio"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Small icon buttons need padding to reach 44px */
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Increase tap area without changing visual size */
+.tap-area-extend {
+  position: relative;
+}
+.tap-area-extend::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+```
+
+### iOS Input Zoom Prevention
+
+```css
+/* iOS zooms on focus if font-size < 16px */
+@media (max-width: 767px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+```
+
+### Scroll Behavior
+
+```css
+/* Smooth scroll with reduced-motion respect */
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* Prevent overscroll bounce on body (optional) */
+body {
+  overscroll-behavior-y: none;
+}
+
+/* Scroll snap for carousels on mobile */
+.mobile-carousel {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-carousel > * {
+  scroll-snap-align: start;
+}
+```
+
+### Mobile Typography Adjustments
+
+```css
+@media (max-width: 479px) {
+  /* Tighten spacing on very small screens */
+  :root {
+    --site-margin: 16px;
+  }
+
+  /* Prevent long words from breaking layout */
+  body {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  /* Slightly reduce body font for very small screens */
+  body {
+    font-size: 16px;    /* 17px → 16px on xs screens */
+  }
+}
+```
+
+### Absolute-Positioned Badge Overflow Protection
+
+```css
+/* Badges positioned above cards need parent margin-top to prevent clipping */
+.card-with-badge {
+  position: relative;
+  margin-top: 16px;
+}
+
+@media (max-width: 479px) {
+  .badge-floating {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+}
+```
+
+### Mobile Navigation Pattern
+
+```css
+/* Hamburger button */
+.nav-hamburger {
+  display: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .nav-hamburger { display: flex; }
+  .nav-links { display: none; }
+
+  /* Mobile nav menu */
+  .nav-mobile-menu {
+    position: fixed;
+    inset: 0;
+    top: var(--nav-height-mobile);
+    background: var(--bg-primary);
+    padding: 16px var(--site-margin);
+    z-index: 199;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .nav-mobile-menu.open {
+    grid-template-rows: 1fr;
+  }
+  .nav-mobile-menu > * { overflow: hidden; }
+
+  .nav-mobile-menu a {
+    display: block;
+    padding: 12px 0;
+    font-size: 17px;
+    border-bottom: 1px solid var(--border-section);
+  }
 }
 ```
 

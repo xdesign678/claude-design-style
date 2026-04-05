@@ -113,9 +113,9 @@ Transition presets, keyframe animations, and loading states for the Anthropic/Cl
 ### Streaming Cursor (AI typing indicator)
 
 ```css
-@keyframes cursor-pulse {
+@keyframes cursor-blink {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  50% { opacity: 0; }
 }
 
 .streaming-cursor {
@@ -126,7 +126,7 @@ Transition presets, keyframe animations, and loading states for the Anthropic/Cl
   border-radius: 1px;
   margin-left: 1px;
   vertical-align: text-bottom;
-  animation: cursor-pulse 1s ease-in-out infinite;
+  animation: cursor-blink 1s ease-in-out infinite;
 }
 ```
 
@@ -266,13 +266,88 @@ gsap.utils.toArray('.word-fade').forEach((el) => {
 ## Lottie Animation Integration
 
 ```javascript
-// Lottie with theme awareness (claude.com pattern)
-// - SVG animations that swap colors based on CSS theme
-// - Scroll-triggered with segmented playback:
-//   1. Intro segment plays on viewport entry
-//   2. Loop segment auto-plays after intro
-// - Lazy loading for performance
-// - Requires: lottie-web or @lottiefiles/lottie-player
+import lottie from 'lottie-web';
+
+/**
+ * Lottie with theme awareness (claude.com pattern)
+ * - SVG animations that swap colors based on CSS theme
+ * - Scroll-triggered with segmented playback
+ * - Lazy loading via IntersectionObserver
+ * - Requires: lottie-web (npm install lottie-web)
+ */
+function initLottie(container, {
+  path,                      // URL to .json animation file
+  introFrames = [0, 60],     // [start, end] for intro segment
+  loopFrames = [60, 120],    // [start, end] for loop segment
+  lazyLoad = true,
+} = {}) {
+  let anim = null;
+
+  function load() {
+    anim = lottie.loadAnimation({
+      container,
+      renderer: 'svg',
+      loop: false,
+      autoplay: false,
+      path,
+    });
+
+    anim.addEventListener('DOMLoaded', () => {
+      // Apply theme colors to SVG paths
+      applyThemeColors(container);
+
+      // 1. Play intro segment on first view
+      anim.playSegments(introFrames, true);
+
+      // 2. Auto-loop after intro completes
+      anim.addEventListener('complete', () => {
+        anim.playSegments(loopFrames, true);
+        anim.loop = true;
+      });
+    });
+  }
+
+  function applyThemeColors(el) {
+    const isDark = document.documentElement.classList.contains('dark')
+      || document.documentElement.dataset.theme === 'dark';
+    const fills = el.querySelectorAll('path[fill], circle[fill]');
+    fills.forEach((path) => {
+      const fill = path.getAttribute('fill');
+      // Swap black/white fills based on theme
+      if (fill === '#141413' || fill === '#000000') {
+        path.setAttribute('fill', isDark ? '#ece9e1' : '#141413');
+      }
+    });
+  }
+
+  // Lazy load: only initialize when element enters viewport
+  if (lazyLoad && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          load();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' }  // Preload 200px before visible
+    );
+    observer.observe(container);
+  } else {
+    load();
+  }
+
+  return {
+    destroy: () => anim?.destroy(),
+    replay: () => { anim?.goToAndPlay(introFrames[0], true); },
+  };
+}
+
+// Usage:
+// initLottie(document.querySelector('.hero-animation'), {
+//   path: '/animations/hero.json',
+//   introFrames: [0, 90],
+//   loopFrames: [90, 180],
+// });
 ```
 
 ## Duration Standards

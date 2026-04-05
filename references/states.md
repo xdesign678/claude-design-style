@@ -225,23 +225,30 @@ Every empty state has three layers: illustration (optional) + heading + descript
   color: var(--text-on-button);
 }
 
-/* Success */
+/* Success — derived from --state-success */
 .toast.success {
-  background: #1a3d2b;
-  color: #d1fae5;
+  background: color-mix(in srgb, var(--state-success, #5a856a) 30%, #0f0f0e);
+  color: color-mix(in srgb, var(--state-success, #5a856a) 25%, #faf9f5);
 }
 
-/* Error */
+/* Error — derived from --state-error */
 .toast.error {
-  background: #3d1a1a;
-  color: #fecaca;
+  background: color-mix(in srgb, var(--state-error, #b85b44) 25%, #0f0f0e);
+  color: color-mix(in srgb, var(--state-error, #b85b44) 20%, #faf9f5);
 }
 
-/* Warning */
+/* Warning — derived from --state-warning */
 .toast.warning {
-  background: #3d2e0a;
-  color: #fef3c7;
+  background: color-mix(in srgb, var(--state-warning, #c4923a) 25%, #0f0f0e);
+  color: color-mix(in srgb, var(--state-warning, #c4923a) 20%, #faf9f5);
 }
+
+/*
+ * Fallback for browsers without color-mix() support:
+ * success:  background: #1a3d2b; color: #d1fae5;
+ * error:    background: #3d1a1a; color: #fecaca;
+ * warning:  background: #3d2e0a; color: #fef3c7;
+ */
 
 .toast .icon {
   width: 16px;
@@ -385,7 +392,7 @@ Every empty state has three layers: illustration (optional) + heading + descript
 ```css
 .offline-banner {
   position: fixed;
-  top: 68px;  /* below nav */
+  top: var(--nav-height, 68px);  /* below nav — inherits from layout.md */
   left: 50%;
   transform: translateX(-50%);
   padding: 10px 20px;
@@ -400,9 +407,127 @@ Every empty state has three layers: illustration (optional) + heading + descript
 }
 ```
 
+### 500 / 503 Error Pages
+
+Server-side error pages share the same layout as 404, with adjusted copy.
+
+```html
+<!-- 500: Internal Server Error -->
+<div class="error-page">
+  <p class="error-code">500</p>
+  <h1 class="error-title">Something went wrong</h1>
+  <p class="error-desc">We're working on it. Please try again in a moment.</p>
+  <a href="/" class="btn-primary">Back to home</a>
+</div>
+
+<!-- 503: Maintenance / Service Unavailable -->
+<div class="error-page">
+  <p class="error-code">503</p>
+  <h1 class="error-title">We'll be back soon</h1>
+  <p class="error-desc">We're performing scheduled maintenance. Check back shortly.</p>
+  <a href="/" class="btn-secondary">Back to home</a>
+</div>
+```
+
+The `.error-page`, `.error-code`, `.error-title`, and `.error-desc` classes are shared with the 404 page above — no additional CSS required.
+
+---
+
+## Full-Page Loading (Route Transitions)
+
+### Top Progress Bar (NProgress-style)
+
+A thin line across the top of the viewport signals route transitions. The `.page-progress` base style is already defined in the **Progress Bar** section above. Use JavaScript to animate width from 0% → 85% during load, then to 100% on complete.
+
+```css
+/* Extend .page-progress with animated fill */
+.page-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: var(--text-primary);
+  z-index: 9999;
+  transform-origin: left;
+  transition: width 300ms ease;
+  /* Start hidden */
+  width: 0%;
+}
+
+/* Animate to ~85% during load */
+.page-progress-bar.loading {
+  width: 85%;
+  transition: width 10s cubic-bezier(0.1, 0.05, 0, 1);  /* decelerate near end */
+}
+
+/* Snap to 100% on complete */
+.page-progress-bar.done {
+  width: 100%;
+  transition: width 150ms ease;
+}
+
+/* Fade out after complete */
+.page-progress-bar.fade-out {
+  opacity: 0;
+  transition: opacity 300ms ease 150ms;
+}
+```
+
+### Full-Page Overlay + Spinner (Optional)
+
+For heavier transitions where a skeleton is not available:
+
+```css
+.page-loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(250, 249, 245, 0.7);  /* --bg-primary at 70% */
+  backdrop-filter: blur(2px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fade-in 200ms ease;
+}
+
+.dark .page-loading-overlay {
+  background: rgba(26, 26, 24, 0.7);     /* --bg-primary dark at 70% */
+}
+
+/* Spinner — reuses existing spinner keyframe if defined */
+.page-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--border-default);
+  border-top-color: var(--text-primary);
+  border-radius: 50%;
+  animation: spin 600ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+```
+
 ---
 
 ## Pagination
+
+### Accessible HTML Structure
+
+```html
+<nav aria-label="pagination">
+  <div class="pagination">
+    <button class="page-btn page-prev" aria-label="Previous page">‹</button>
+    <button class="page-btn" aria-label="Page 1">1</button>
+    <button class="page-btn active" aria-current="page" aria-label="Page 2, current">2</button>
+    <button class="page-btn" aria-label="Page 3">3</button>
+    <span class="page-ellipsis" aria-hidden="true">…</span>
+    <button class="page-btn" aria-label="Page 10">10</button>
+    <button class="page-btn page-next" aria-label="Next page">›</button>
+  </div>
+</nav>
+```
 
 ```css
 .pagination {
@@ -455,5 +580,74 @@ Every empty state has three layers: illustration (optional) + heading + descript
   font-size: 13px;
   color: var(--text-secondary);
   margin-left: 8px;
+}
+```
+
+---
+
+## Mobile Adaptations
+
+### Toast on Mobile
+
+```css
+@media (max-width: 767px) {
+  .toast-container {
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    left: 16px;
+    right: 16px;
+    transform: none;
+  }
+
+  .toast {
+    min-width: auto;
+    max-width: none;
+    width: 100%;
+  }
+}
+```
+
+### Pagination on Mobile
+
+```css
+@media (max-width: 479px) {
+  .page-btn {
+    min-width: 44px;
+    height: 44px;
+    font-size: 15px;
+  }
+
+  /* Hide ellipsis and middle pages — show only prev/next + current */
+  .page-ellipsis { display: none; }
+  .page-btn:not(.active):not(.page-prev):not(.page-next) {
+    display: none;
+  }
+
+  .pagination-info { display: none; }
+}
+```
+
+### Empty State on Mobile
+
+```css
+@media (max-width: 479px) {
+  .empty-state {
+    padding: 48px 24px;
+  }
+
+  .empty-state-icon {
+    width: 40px;
+    height: 40px;
+  }
+}
+```
+
+### Error Page on Mobile
+
+```css
+@media (max-width: 479px) {
+  .error-page {
+    padding: 48px 24px;
+    min-height: calc(100vh - var(--nav-height-mobile, 56px));
+  }
 }
 ```

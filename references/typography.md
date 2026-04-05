@@ -10,12 +10,12 @@ Font loading, stacks, computed styles, and configuration for the Anthropic/Claud
 
 | Anthropic Font | Role on Site | Best Open-Source Equivalent |
 |---------------|--------------|----------------------------|
-| `AnthropicSans` | Primary UI, headings, navigation, buttons | **Geist** (preferred), **Inter** |
+| `Anthropic Sans` | Primary UI, headings, navigation, buttons | **Geist** (preferred), **Inter** |
 | `TiemposText` | Article body, long-form reading content | **Lora** (closest match), Source Serif Pro |
-| `AnthropicSerif` | Brand/display serif | **Libre Caslon Text**, EB Garamond |
+| `Anthropic Serif` | Brand/display serif | **Libre Caslon Text**, EB Garamond |
 | `StyreneA` / `StyreneB` | Display headlines, marketing hero | **Barlow**, DM Sans (approximate) |
 | `Copernicus` | Large brand headlines | **Playfair Display**, Cormorant Garamond |
-| `AnthropicMono` | Code (primary) | **Geist Mono** (preferred), JetBrains Mono |
+| `Anthropic Mono` | Code (primary) | **Geist Mono** (preferred), JetBrains Mono |
 | `JetBrainsMono` | Code (secondary, variable) | **JetBrains Mono** (exact match — open source) |
 | Noto Serif SC | Chinese body text | **Noto Serif SC** (same font — Google Fonts) |
 | LXGW WenKai | Chinese elegant option | **LXGW WenKai** (same font — open source) |
@@ -77,6 +77,70 @@ const notoSerifSC = Noto_Serif_SC({
 ```
 
 If Geist is not available via Google Fonts, **Inter** is the closest sans-serif fallback.
+
+### `font-display: swap` — Latin Font Loading Guide
+
+`font-display: swap` instructs the browser to show system fallback text immediately while the custom font loads, then swap to the custom font once ready. This prevents invisible text (FOIT) at the cost of a brief flash (FOUT).
+
+**When to use swap:**
+
+| Font type | Recommended `font-display` | Reason |
+|-----------|---------------------------|--------|
+| Latin UI / body (Geist, Inter, Lora) | `swap` | Small file (30–80 KB), swap is barely noticeable |
+| CJK fonts (Noto Serif SC, LXGW WenKai) | `swap` | Files are large (2–4 MB); must never block render |
+| Icon / symbol fonts | `block` (short) or `swap` | Depends on criticality; `block` prevents broken icons |
+
+**Next.js** (recommended — automatic):
+
+```tsx
+// next/font applies font-display: swap by default for all Google Fonts
+const geistSans = Geist({ subsets: ['latin'] }); // swap is implicit
+```
+
+**Plain `@font-face`:**
+
+```css
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;   /* show fallback immediately, swap on load */
+}
+
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora-Variable.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* CJK — always swap, file is too large to block */
+@font-face {
+  font-family: 'Noto Serif SC';
+  font-display: swap;
+  /* ... */
+}
+```
+
+**Minimise FOUT impact:**
+
+```css
+/* Define a system-font fallback with matching metrics to reduce layout shift */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+  size-adjust: 107%;
+}
+
+:root {
+  --font-sans: 'Geist', 'Inter', 'Inter Fallback', system-ui, sans-serif;
+}
+```
 
 ## CSS Custom Properties
 
@@ -377,8 +441,8 @@ color: #faf9f5 (on dark button)
 ### Blockquote
 
 ```
-border-left: 2px solid rgba(20,20,19,0.15)
-padding-left: 24px
+border-left: 1px solid var(--text-primary)   /* 1px full-opacity — measured 2026-04 */
+padding-left: 16px                            /* 16px measured, not 24px */
 font-style: normal (NOT italic)
 color: var(--text-secondary)
 ```

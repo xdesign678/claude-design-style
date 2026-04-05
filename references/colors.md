@@ -4,14 +4,14 @@ Complete color token system for the Anthropic/Claude design style.
 
 ## Site-Specific Color Notes
 
-> Anthropic operates two distinct sites with slightly different color bases:
+> Anthropic operates two sites. Both now use the same background color:
 >
 > | Site | Background | Use Case |
 > |------|-----------|----------|
-> | `claude.com` / `claude.ai` | `#faf9f7` (light cream) | App and product pages — the primary reference for this skill |
-> | `anthropic.com` | `#e8e6dc` (warm gray-beige) | Corporate/research site — deeper warm tone |
+> | `claude.com` / `claude.ai` | `#faf9f5` (warm off-white) | App and product pages |
+> | `anthropic.com` | `#faf9f5` (same) | Corporate/research site — measured 2026-04 |
 >
-> This skill targets the **claude.com aesthetic** (lighter, cream-white). When building for an anthropic.com-style corporate page, shift `--bg-primary` toward `#e8e6dc`.
+> **Note:** An earlier version of this document noted `#e8e6dc` for anthropic.com. As of 2026, both sites use `#faf9f5`. The `--bg-primary` token is correct for both contexts.
 
 ## Design Principles
 
@@ -27,17 +27,19 @@ Complete color token system for the Anthropic/Claude design style.
 :root {
   /* ── Brand ── */
   --brand-clay: #d97757;
-  --brand-clay-hover: #c66646;  /* Darker clay for hover states (e.g., upload zone dragging) */
+  --brand-clay-hover: #c6613f;  /* Darker clay for hover states — extracted from anthropic.com 2026-04 */
+  --brand-clay-accent: #c6613f; /* Accent variant (alias of hover) */
 
   /* ── Backgrounds ── */
   --bg-primary: #faf9f5;        /* page background */
-  --bg-secondary: #f9f9f7;      /* alternate sections */
+  --bg-secondary: #f0eee6;      /* alternate sections — extracted 2026-04 */
+  --bg-secondary-hover: #e8e6dc; /* secondary section hover — extracted 2026-04 */
   --bg-hover: #f5f4f0;          /* interactive hover */
   --bg-active: #efeee8;         /* pressed/active state */
   --bg-card: #ffffff;           /* card/panel surface */
   --bg-muted: #f0efe8;          /* code bg, muted sections */
   --bg-button: #0f0f0e;         /* primary button */
-  --bg-button-hover: #2a2a27;   /* primary button hover */
+  --bg-button-hover: #3d3d3a;   /* primary button hover — extracted 2026-04 */
   --bg-input: #ffffff;          /* form inputs */
   --bg-overlay: rgba(0,0,0,0.5); /* modal overlay */
 
@@ -52,10 +54,10 @@ Complete color token system for the Anthropic/Claude design style.
   --text-on-clay: #ffffff;      /* on brand clay backgrounds */
   --text-link: inherit;         /* links inherit text color */
 
-  /* ── Borders ── */
-  --border-light: rgba(0,0,0,0.08);
-  --border-default: rgba(0,0,0,0.12);
-  --border-section: rgba(0,0,0,0.06);
+  /* ── Borders (warm-tinted, using text-primary base #141413) ── */
+  --border-light: rgba(20,20,19,0.08);
+  --border-default: rgba(20,20,19,0.12);
+  --border-section: rgba(20,20,19,0.06);
   --border-focus: rgba(94,93,89,0.3);
 
   /* ── Shadows ── */
@@ -89,6 +91,7 @@ Complete color token system for the Anthropic/Claude design style.
   --text-primary: #ece9e1;
   --text-body: rgba(236,233,225,0.85);
   --text-secondary: #9b9b95;
+  --text-muted: #c0beb8;           /* between primary and secondary in dark mode */
   --text-tertiary: #6b6b66;
   --text-disabled: #4a4a45;
   --text-on-button: #1a1a18;
@@ -121,9 +124,10 @@ Complete color token system for the Anthropic/Claude design style.
 | Secondary text | #5e5d59 | #9b9b95 | Supporting info |
 | Muted text | #b0aea5 | #6b6b66 | Timestamps, labels |
 | Primary button bg | #0f0f0e | #ece9e1 | Inverts between modes |
+| Secondary bg | #f0eee6 | — | Alternate sections, warmer than primary |
 | Hover bg | #f5f4f0 | #2a2a27 | Subtle background shift |
-| Border default | rgba(0,0,0,0.12) | rgba(236,233,225,0.12) | Warm-tinted alpha |
-| Divider | rgba(0,0,0,0.06) | rgba(236,233,225,0.06) | Very subtle |
+| Border default | rgba(20,20,19,0.12) | rgba(236,233,225,0.12) | Warm-tinted alpha |
+| Divider | rgba(20,20,19,0.06) | rgba(236,233,225,0.06) | Very subtle |
 
 ## Extended Brand Palette
 
@@ -131,13 +135,13 @@ Used for illustrations, section backgrounds, and visual variety. Apply sparingly
 
 ```css
 :root {
-  /* Extended palette for illustrations and section backgrounds */
-  --color-sky: #a8c9e8;        /* light blue - research/tech sections */
-  --color-olive: #b5c4a1;      /* muted green - sustainability/growth */
-  --color-cactus: #9db3a3;     /* sage green - safety/stability */
-  --color-heather: #c5b8d4;    /* soft purple - innovation */
-  --color-fig: #6b5b7e;        /* deep purple - premium/enterprise */
-  --color-coral: #f0a8a8;      /* warm pink - community/people */
+  /* Extended palette — extracted from anthropic.com swatch system 2026-04 */
+  --color-sky: #6a9bcc;        /* blue - research/tech sections */
+  --color-olive: #788c5d;      /* olive green - sustainability/growth */
+  --color-cactus: #bcd1ca;     /* sage green - safety/stability */
+  --color-heather: #cbcadb;    /* soft purple - innovation */
+  --color-fig: #c46686;        /* warm pink - premium/enterprise */
+  --color-coral: #ebcece;      /* light pink - community/people */
   --color-oat: #d4c9b8;        /* neutral tan - neutral sections */
   --color-ivory: #f7f5f0;      /* off-white - callout backgrounds */
 }
@@ -149,10 +153,17 @@ Use sparingly and only for system states. Anthropic avoids colored accents for i
 
 ```css
 :root {
-  --status-success: #2d7a4f;
-  --status-warning: #f59e0b;
-  --status-error: #dc2626;
-  --status-info: #3b82f6;
+  --state-error: #b85b44;
+  --state-success: #5a856a;
+  --state-warning: #c4923a;
+  --state-info: #5a7d9b;
+}
+
+.dark, [data-theme="dark"] {
+  --state-error: #d4826a;
+  --state-success: #7aab87;
+  --state-warning: #d4a85a;
+  --state-info: #7a9db5;
 }
 ```
 

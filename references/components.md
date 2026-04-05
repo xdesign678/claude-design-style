@@ -249,14 +249,14 @@ tr:hover td { background: var(--bg-hover); }
 ```css
 blockquote {
   margin: 16px 0;
-  padding: 12px 24px;
-  border-left: 2px solid rgba(20,20,19,0.15);
+  padding: 12px 16px;              /* padding-left: 16px (measured on anthropic.com) */
+  border-left: 1px solid var(--text-primary);  /* 1px, full-opacity — measured 2026-04 */
   color: var(--text-secondary);
   font-style: normal;              /* NOT italic — Anthropic convention */
 }
 
 .dark blockquote {
-  border-left-color: rgba(236,233,225,0.15);
+  border-left-color: var(--text-primary);      /* full-opacity warm cream in dark mode */
 }
 ```
 
@@ -448,7 +448,74 @@ ol li {
 }
 .carousel-dot.active { background: var(--text-primary); }
 
-/* Auto-rotation: 3 second interval (match Anthropic) */
+```
+
+### Carousel JavaScript
+
+```javascript
+function initCarousel(el, { interval = 3000, pauseOnHover = true } = {}) {
+  const track = el.querySelector('.carousel-track');
+  const slides = el.querySelectorAll('.carousel-slide');
+  const dots = el.querySelectorAll('.carousel-dot');
+  let current = 0;
+  let timer = null;
+
+  function goTo(index) {
+    current = ((index % slides.length) + slides.length) % slides.length;
+    track.style.transform = `translateX(-${current * 100}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+
+  function next() { goTo(current + 1); }
+
+  function startAutoPlay() {
+    stopAutoPlay();
+    timer = setInterval(next, interval);
+  }
+
+  function stopAutoPlay() {
+    if (timer) { clearInterval(timer); timer = null; }
+  }
+
+  // Dot click navigation
+  dots.forEach((dot, i) => dot.addEventListener('click', () => {
+    goTo(i);
+    startAutoPlay(); // Reset timer on manual navigation
+  }));
+
+  // Pause on hover (Anthropic pattern)
+  if (pauseOnHover) {
+    el.addEventListener('mouseenter', stopAutoPlay);
+    el.addEventListener('mouseleave', startAutoPlay);
+  }
+
+  // Keyboard support
+  el.setAttribute('role', 'region');
+  el.setAttribute('aria-roledescription', 'carousel');
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') { goTo(current - 1); startAutoPlay(); }
+    if (e.key === 'ArrowRight') { goTo(current + 1); startAutoPlay(); }
+  });
+
+  startAutoPlay();
+  return { goTo, next, destroy: stopAutoPlay };
+}
+
+// Usage: initCarousel(document.querySelector('.carousel'));
+```
+
+### Carousel Touch / Swipe Support
+
+Add after `initCarousel` is called, passing the same `carousel` element:
+
+```javascript
+// Touch/swipe support
+let startX = 0;
+carousel.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; });
+carousel.addEventListener('touchend', (e) => {
+  const diff = startX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) diff > 0 ? next() : prev();
+});
 ```
 
 ## Expandable / See More
@@ -487,6 +554,78 @@ ol li {
   transition: transform 200ms ease;
 }
 .expandable-trigger.open .icon { transform: rotate(180deg); }
+```
+
+## Pricing Card (Featured)
+
+Featured pricing cards use color inversion: dark background with cream text and inverted CTA button.
+
+```css
+/* Standard pricing card */
+.pricing-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 32px;
+  position: relative;
+  margin-top: 16px;                    /* space for badge overflow */
+}
+
+/* Featured variant — color inversion */
+.pricing-card.featured {
+  background: var(--bg-button);         /* #0f0f0e — same as primary button */
+  color: var(--text-on-button);         /* #faf9f5 */
+  border-color: var(--border-default);
+}
+
+.pricing-card.featured .pricing-price,
+.pricing-card.featured .pricing-name {
+  color: var(--text-on-button);
+}
+
+.pricing-card.featured .pricing-desc {
+  color: rgba(250,249,245,0.7);         /* cream at 70% */
+}
+
+/* Featured CTA — inverted (cream bg, dark text) */
+.pricing-card.featured .pricing-cta {
+  background: var(--text-on-button);    /* #faf9f5 */
+  color: var(--bg-button);             /* #0f0f0e */
+  border-color: transparent;
+}
+.pricing-card.featured .pricing-cta:hover {
+  background: #ece9e1;
+  transform: translateY(-1px);
+}
+
+/* "Most Popular" badge */
+.pricing-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  border-radius: 4px;
+  background: var(--brand-clay);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Dark mode featured card */
+.dark .pricing-card.featured {
+  background: var(--bg-button);         /* #ece9e1 in dark mode */
+  color: var(--text-on-button);         /* #1a1a18 */
+}
+
+/* Mobile badge overflow protection */
+@media (max-width: 479px) {
+  .pricing-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+}
 ```
 
 ## Card Grid with Hover Dimming
@@ -579,12 +718,17 @@ ol li {
   pointer-events: none;
 }
 
-/* Hover-intent: 120ms close delay (prevents flicker) */
+/* Hover-intent: 120ms close delay (prevents flicker on mouse movement) */
+.tooltip-trigger .tooltip-content {
+  transition: opacity 150ms ease 120ms, visibility 150ms ease 120ms;  /* 120ms delay on close */
+}
+
 .tooltip-trigger:hover .tooltip-content,
 .tooltip-trigger:focus-visible .tooltip-content {
   opacity: 1;
   visibility: visible;
-  transition-delay: 0ms;
+  pointer-events: auto;          /* allow hovering over tooltip itself */
+  transition-delay: 0ms;         /* instant open, delayed close */
 }
 ```
 
@@ -608,5 +752,167 @@ ol li {
   grid-area: 1 / 1 / 2 / 2;
   padding: 16px;
   font: inherit;
+}
+```
+
+---
+
+## Breadcrumb
+
+### HTML Structure
+
+```html
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="/" class="breadcrumb-link">Home</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="/docs" class="breadcrumb-link">Documentation</a>
+    </li>
+    <li class="breadcrumb-item" aria-current="page">
+      <span class="breadcrumb-current">Getting Started</span>
+    </li>
+  </ol>
+</nav>
+```
+
+### CSS
+
+```css
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+}
+
+/* Separator — inserted via pseudo-element after each item except last */
+.breadcrumb-item:not(:last-child)::after {
+  content: '›';
+  margin: 0 8px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  line-height: 1;
+  user-select: none;
+  aria-hidden: true;
+}
+
+.breadcrumb-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 150ms ease;
+  line-height: 1.5;
+}
+
+.breadcrumb-link:hover {
+  color: var(--text-primary);
+}
+
+.breadcrumb-current {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Dark mode — variables auto-switch; no extra rules needed */
+```
+
+---
+
+## Sticky Sidebar
+
+For documentation and article pages with a persistent navigation column.
+
+```css
+.doc-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.sticky-sidebar {
+  position: sticky;
+  top: calc(68px + 24px);          /* nav height 68px + spacing */
+  max-height: calc(100vh - 68px - 48px);
+  overflow-y: auto;
+  padding-right: 8px;              /* breathing room for scrollbar */
+}
+
+/* Custom scrollbar — matches motion.md pattern */
+.sticky-sidebar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sticky-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sticky-sidebar::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+.sticky-sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Sidebar nav links */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.sidebar-link:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.sidebar-link.active {
+  color: var(--text-primary);
+  font-weight: 500;
+  background: var(--bg-muted);
+}
+
+/* Section heading within sidebar */
+.sidebar-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding: 16px 12px 6px;
+  margin: 0;
+}
+
+/* Responsive: hide sidebar below 768px */
+@media (max-width: 767px) {
+  .doc-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sticky-sidebar {
+    display: none;    /* collapse entirely on mobile; or use a drawer pattern */
+  }
 }
 ```
